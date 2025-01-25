@@ -14,7 +14,7 @@ const Modal: React.FC<ModalProps> = ({ title, message, onClose }) => {
       <ModalContainer>
         <h2>{title}</h2>
         <p>{message}</p>
-        <button onClick={onClose}>Close</button>
+        <button onClick={onClose}>Fechar</button>
       </ModalContainer>
     </ModalOverlay>
   );

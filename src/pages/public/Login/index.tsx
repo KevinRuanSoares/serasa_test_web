@@ -15,12 +15,17 @@ import {
   Title,
 } from '../../../styles/public/Login/index';
 
+import Modal from '../../../components/Modal';
+
 const Login = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('login');
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+
+  const closeModal = () => setShowModal(false);
 
   const submitForm = async (e: { preventDefault: () => void }) => {
     setLoading(true);
@@ -33,10 +38,12 @@ const Login = () => {
       if (authenticated) {
         dispatch(login(authenticated));
       } else {
-        console.error('Please check your login information.');
+        setModalMessage('Por favor, verifique suas informações de login.');
+        setShowModal(true);
       }
     } catch (error) {
-      console.error('Login failed:', error);
+      setModalMessage('Login falhou. Por favor, tente novamente.');
+      setShowModal(true);
     } finally {
       setLoading(false);
     }
@@ -48,7 +55,7 @@ const Login = () => {
         <ProfileIcon>
           <img src="assets/icon.png" alt="Profile" width={60} />
         </ProfileIcon>
-        <Title>{activeTab === 'login' ? 'Login' : 'Sign Up'}</Title>
+        <Title>Login</Title>
         <LoginForm onSubmit={submitForm}>
           <FormGroup>
             <label htmlFor="email">Email</label>
@@ -77,6 +84,14 @@ const Login = () => {
           </SubmitButton>
         </LoginForm>
       </LoginCard>
+
+      {showModal && (
+        <Modal
+          title="Ops!"
+          message={modalMessage}
+          onClose={closeModal}
+        />
+      )}
     </LoginContainer>
   );
 };
