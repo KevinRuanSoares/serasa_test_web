@@ -52,7 +52,7 @@ export const StyledTable = styled.table`
 
     &.edit {
       background-color: #ffcc00;
-      color: #333;
+      color: white;
 
       &:hover {
         background-color: #e6b800;

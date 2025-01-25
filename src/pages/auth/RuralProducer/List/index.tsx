@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../../../redux/store';
 import TopBar from "../../../../components/TopBar";
 import Sidebar from "../../../../components/Sidebar";
+import { Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { setCurrentPageTitle } from '../../../../redux/slices/themeSlice';
 import {
   RuralProducerListContainer,
@@ -14,6 +15,8 @@ import {
 import GenericTable from "../../../../components/GenericTable";
 import { ProducerService } from '../../../../services/producers';
 import Modal from '../../../../components/Modal';
+import ModalConfirmAlert from '../../../../components/ModalConfirm';
+
 interface Producer {
   cpf_cnpj: string;
   name: string;
@@ -40,13 +43,19 @@ const RuralProducerList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Generic Modal
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [modalTitle, setModalTitle] = useState('');
   const closeModal = () => setShowModal(false);
 
-  const userAuth = useSelector((state: IRootState) => state.auth);
+  // Confirm Modal
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmModalMessage, setConfirmModalMessage] = useState('');
+  const [confirmModalTitle, setConfirmModalTitle] = useState('');
+  const [deleteProducerId, setDeleteProducerId] = useState<string | null>(null);
 
+  const userAuth = useSelector((state: IRootState) => state.auth);
   const token = userAuth.token; // Replace with actual token retrieval logic
 
   useEffect(() => {
@@ -61,9 +70,8 @@ const RuralProducerList: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-
       if (!token) {
-        handleShowModal("Ops!", "User not authenticated.");
+        handleShowModal("Ops!", "Usuario não autenticado.");
         return;
       }
 
@@ -90,7 +98,31 @@ const RuralProducerList: React.FC = () => {
     setModalTitle(title);
     setModalMessage(message);
     setShowModal(true);
-  }
+  };
+
+  const handleShowConfirmModal = (title: string, message: string, id?: string) => {
+    setConfirmModalTitle(title);
+    setConfirmModalMessage(message);
+    if (id) setDeleteProducerId(id);
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!token || !deleteProducerId) {
+      handleShowModal("Ops!", "Usuario não autenticado.");
+      return;
+    }
+
+    const success = await ProducerService.deleteProducer({ token, id: deleteProducerId });
+    if (success) {
+      handleShowModal("Sucesso", "Produtor excluído com sucesso.");
+      fetchData(currentPage);
+    } else {
+      handleShowModal("Ops!", "Falha ao excluir produtor.");
+    }
+    setDeleteProducerId(null);
+    setShowConfirmModal(false);
+  };
 
   const handlePageChange = (direction: "next" | "previous") => {
     if (direction === "next" && paginationData.next) {
@@ -108,25 +140,6 @@ const RuralProducerList: React.FC = () => {
     alert(`Edit functionality triggered for producer ID: ${id}`);
   };
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this producer?")) {
-
-      if (!token) {
-        handleShowModal("Ops!", "User not authenticated.");
-        return;
-      }
-
-      const success = await ProducerService.deleteProducer({ token, id });
-      if (success) {
-        handleShowModal("Sucesso", "Producer deleted successfully!");
-        fetchData(currentPage);
-      } else {
-        handleShowModal("Ops!", "Failed to delete producer.");
-        setShowModal(true);
-      }
-    }
-  };
-
   const columns: { header: string; accessor: keyof Producer; render?: (value: string) => string }[] = [
     { header: "CPF/CNPJ", accessor: "cpf_cnpj" },
     { header: "Nome", accessor: "name" },
@@ -142,17 +155,29 @@ const RuralProducerList: React.FC = () => {
         <MainContent>
           <h1>Produtores Rurais</h1>
           <ButtonContainer>
-            <button onClick={handleCreate}>+ Create Producer</button>
+            <button onClick={handleCreate}>+ Cadastrar Produtor</button>
           </ButtonContainer>
           {loading && <p>Loading...</p>}
           {error && <p style={{ color: "red" }}>{error}</p>}
           <GenericTable
             data={producers}
             columns={columns}
-            actions={(row) => (
+            edit={(row) => (
               <>
-                <button className="edit" onClick={() => handleEdit(row.id)}>Edit</button>
-                <button className="delete" onClick={() => handleDelete(row.id)}>Delete</button>
+                <button className="edit" onClick={() => handleEdit(row.id)}>
+                  <Pencil size={20} />
+                </button>
+              </>
+            )}
+            remove={(row) => (
+              <>
+                <button className="delete" onClick={() => handleShowConfirmModal(
+                  "Confirmar Exclusão",
+                  "Tem certeza de que deseja excluir este produtor?",
+                  row.id
+                )}>
+                  <Trash2 size={20} />
+                </button>
               </>
             )}
           />
@@ -161,23 +186,38 @@ const RuralProducerList: React.FC = () => {
               onClick={() => handlePageChange("previous")}
               disabled={!paginationData.previous}
             >
-              Previous
+              <ChevronLeft size={20} />
             </button>
-            <span>Page {currentPage}</span>
+            <span>Página {currentPage}</span>
             <button
               onClick={() => handlePageChange("next")}
               disabled={!paginationData.next}
             >
-              Next
+              <ChevronRight size={20}/>
             </button>
           </PaginationContainer>
         </MainContent>
       </ContentArea>
+
+      {/* Generic Modal */}
       {showModal && (
         <Modal
           title={modalTitle}
           message={modalMessage}
           onClose={closeModal}
+        />
+      )}
+
+      {/* Confirm Modal */}
+      {showConfirmModal && (
+        <ModalConfirmAlert
+          title={confirmModalTitle}
+          message={confirmModalMessage}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => {
+            setDeleteProducerId(null);
+            setShowConfirmModal(false);
+          }}
         />
       )}
     </RuralProducerListContainer>

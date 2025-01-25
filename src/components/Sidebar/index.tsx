@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from 'react-redux';
 import { IRootState } from '../../redux/store';
-import { Home } from "lucide-react";
+import { List } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { SidebarContainer, LogoSection, Logo, NavSection, NavItem, LogoutSection } from "./styles";
 
@@ -29,7 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
                   navigate('/rural-producer-list');
                 }}
               >
-                <Home size={20} />
+                <List size={20} />
                 <span>Produtores Rurais</span>
               </NavItem>
             </NavSection>

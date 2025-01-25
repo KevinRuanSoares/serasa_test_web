@@ -10,13 +10,15 @@ interface Column<T> {
 interface GenericTableProps<T> {
   data: T[]; // Row data
   columns: Column<T>[]; // Column definitions
-  actions?: (row: T) => React.ReactNode; // Optional actions column
+  edit?: (row: T) => React.ReactNode; // Optional edit column
+  remove?: (row: T) => React.ReactNode; // Optional delete column
 }
 
 const GenericTable = <T,>({
   data,
   columns,
-  actions,
+  edit,
+  remove,
 }: GenericTableProps<T>): React.ReactElement => {
   return (
     <StyledTable>
@@ -25,7 +27,8 @@ const GenericTable = <T,>({
           {columns.map((col, index) => (
             <th key={index}>{col.header}</th>
           ))}
-          {actions && <th>Actions</th>}
+          {edit && <th>Editar</th>}
+          {remove && <th>Remover</th>}
         </tr>
       </thead>
       <tbody>
@@ -38,7 +41,8 @@ const GenericTable = <T,>({
                   : row[col.accessor]?.toString()}
               </td>
             ))}
-            {actions && <td>{actions(row)}</td>}
+            {edit && <td style={{textAlign: 'center'}}>{edit(row)}</td>}
+            {remove && <td style={{justifyContent: 'center'}}>{remove(row)}</td>}
           </tr>
         ))}
       </tbody>
