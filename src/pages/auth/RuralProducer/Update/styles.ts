@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const RuralProducerCreateContainer = styled.div`
+export const RuralProducerUpdateContainer = styled.div`
   display: flex;
   height: 100vh;
   background-color: #fff !important;
@@ -105,7 +105,7 @@ export const ButtonContainer = styled.div`
 
   button {
     padding: 10px 15px;
-    background-color: #28a745;
+    background-color: #ffcc00;
     color: white;
     border: none;
     border-radius: 5px;
@@ -114,7 +114,7 @@ export const ButtonContainer = styled.div`
     transition: background-color 0.3s ease;
 
     &:hover {
-      background-color: #218838;
+      background-color: #e6b800;
     }
   }
 `;

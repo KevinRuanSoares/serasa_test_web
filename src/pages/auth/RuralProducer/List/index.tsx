@@ -141,7 +141,7 @@ const RuralProducerList: React.FC = () => {
   };
 
   const handleEdit = async (id: string) => {
-    alert(`Edit functionality triggered for producer ID: ${id}`);
+    navigate(`/rural-producer-update?id=${id}`);
   };
 
   const columns: { header: string; accessor: keyof Producer; render?: (value: string) => string }[] = [

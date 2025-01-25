@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from 'react-redux';
 import { IRootState } from '../../redux/store';
-import { List } from "lucide-react";
+import { List, CircleGauge } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { SidebarContainer, LogoSection, Logo, NavSection, NavItem, LogoutSection } from "./styles";
 
@@ -19,11 +19,23 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
       {theme.isMenuOpen && (
           <SidebarContainer>
             <LogoSection>
-              <Logo>
-              <img src="assets/icon.png" alt="ProfProfile" width={50} />
+              <Logo
+                onClick={() => {
+                  navigate('/dashboard');
+                }}
+              >
+                <img src="assets/icon.png" alt="ProfProfile" width={50} />
               </Logo>
             </LogoSection>
             <NavSection>
+              <NavItem
+                onClick={() => {
+                  navigate('/dashboard');
+                }}
+              >
+                <CircleGauge size={20} />
+                <span>Dashboard</span>
+              </NavItem>
               <NavItem
                 onClick={() => {
                   navigate('/rural-producer-list');

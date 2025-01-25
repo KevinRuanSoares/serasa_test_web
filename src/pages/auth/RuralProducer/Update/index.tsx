@@ -1,4 +1,4 @@
-// src/pages/RuralProducerCreate/index.tsx
+// src/pages/RuralProducerUpdate/index.tsx
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../../../redux/store';
@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import TopBar from "../../../../components/TopBar";
 import Sidebar from "../../../../components/Sidebar";
 import {
-  RuralProducerCreateContainer,
+  RuralProducerUpdateContainer,
   ContentArea,
   MainContent,
   ButtonContainer,
@@ -22,7 +22,7 @@ import {
   FormTitle,
 } from "./styledForm";
 
-const RuralProducerCreate: React.FC = () => {
+const RuralProducerUpdate: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [cpfCnpj, setCpfCnpj] = useState("");
@@ -35,7 +35,7 @@ const RuralProducerCreate: React.FC = () => {
   const token = userAuth.token;
 
   useEffect(() => {
-    dispatch(setCurrentPageTitle({ title: "Cadastrar Produtor Rural" }));
+    dispatch(setCurrentPageTitle({ title: "Editar Produtor Rural" }));
   }, [dispatch]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -79,13 +79,13 @@ const RuralProducerCreate: React.FC = () => {
   };
 
   return (
-    <RuralProducerCreateContainer>
+    <RuralProducerUpdateContainer>
       <Sidebar />
       <ContentArea>
         <TopBar />
         <MainContent>
           <FormContainer>
-            <FormTitle>Cadastrar Produtor Rural</FormTitle>
+            <FormTitle>Editar Produtor Rural</FormTitle>
             {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
             <form onSubmit={handleFormSubmit}>
               <FormField>
@@ -110,7 +110,7 @@ const RuralProducerCreate: React.FC = () => {
               </FormField>
               <ButtonContainer>
                 <button type="submit" disabled={loading}>
-                  {loading ? "Salvando..." : "Cadastrar"}
+                  {loading ? "Salvando..." : "Editar"}
                 </button>
               </ButtonContainer>
             </form>
@@ -118,8 +118,8 @@ const RuralProducerCreate: React.FC = () => {
         </MainContent>
       </ContentArea>
       {error && <Modal title="Ops!" message={error} onClose={() => setError(null)} />}
-    </RuralProducerCreateContainer>
+    </RuralProducerUpdateContainer>
   );
 };
 
-export default RuralProducerCreate;
+export default RuralProducerUpdate;
