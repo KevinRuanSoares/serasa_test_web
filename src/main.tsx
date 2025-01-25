@@ -1,10 +1,28 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import React, { Suspense } from 'react';
+import ReactDOM from 'react-dom/client';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+// Router
+import { RouterProvider } from 'react-router-dom';
+import router from './router/index';
+
+// Mantine
+import { MantineProvider } from '@mantine/core';
+
+// Redux
+import { Provider } from 'react-redux';
+import store from './redux/store';
+
+
+
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+    <React.StrictMode>
+        <MantineProvider>
+            <Suspense>
+                <Provider store={store}>
+                    <RouterProvider router={router} />
+                </Provider>
+            </Suspense>
+        </MantineProvider>
+    </React.StrictMode>
+);
+
