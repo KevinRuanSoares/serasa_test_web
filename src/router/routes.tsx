@@ -2,6 +2,8 @@ import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 const Login = lazy(() => import('../pages/public/Login'));
 const Dashboard = lazy(() => import('../pages/auth/Dashboard'));
+const RuralProducerCreate = lazy(() => import('../pages/auth/RuralProducer/Create'));
+const RuralProducerList = lazy(() => import('../pages/auth/RuralProducer/List'));
 
 const routes = [
     // Public routes
@@ -24,6 +26,19 @@ const routes = [
         layout: 'default',
         protected: true,
     },
+    {
+        path: '/rural-producer-list',
+        element: <RuralProducerList />,
+        layout: 'default',
+        protected: true,
+    },
+    {
+        path: '/rural-producer-create',
+        element: <RuralProducerCreate />,
+        layout: 'default',
+        protected: true,
+    },
+
 ];
 
 export { routes };

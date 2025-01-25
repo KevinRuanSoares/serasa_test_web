@@ -1,7 +1,8 @@
 import React from "react";
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { IRootState } from '../../redux/store';
-import { Home, Settings, FileText } from "lucide-react";
+import { Home } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 import { SidebarContainer, LogoSection, Logo, NavSection, NavItem, LogoutSection } from "./styles";
 
 interface SidebarProps {
@@ -11,6 +12,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
 
   const theme = useSelector((state: IRootState) => state.theme);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -22,17 +24,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
               </Logo>
             </LogoSection>
             <NavSection>
-              <NavItem>
+              <NavItem
+                onClick={() => {
+                  navigate('/rural-producer-list');
+                }}
+              >
                 <Home size={20} />
-                <span>Home</span>
-              </NavItem>
-              <NavItem>
-                <FileText size={20} />
-                <span>Reports</span>
-              </NavItem>
-              <NavItem>
-                <Settings size={20} />
-                <span>Settings</span>
+                <span>Produtores Rurais</span>
               </NavItem>
             </NavSection>
             <LogoutSection>

@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import TopBar from "../../../components/TopBar";
 import Sidebar from "../../../components/Sidebar";
 import { setCurrentPageTitle } from '../../../redux/slices/themeSlice';
-import { DashboardContainer, ContentArea, MainContent } from "../../../styles/auth/Dashboard";
+import { DashboardContainer, ContentArea, MainContent } from "./styles";
 
 const Dashboard = () => {
 

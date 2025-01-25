@@ -13,7 +13,7 @@ import {
   FormGroup,
   SubmitButton,
   Title,
-} from '../../../styles/public/Login/index';
+} from './styles';
 
 import Modal from '../../../components/Modal';
 
