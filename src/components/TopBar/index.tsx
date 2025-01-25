@@ -1,16 +1,25 @@
 import React from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { IRootState } from '../../redux/store';
+import { logout } from '../../redux/slices/authSlice';
 import { TopBarContainer, LeftSection, IconButton, CenterSection, SearchInputContainer, SearchInput, LogoutButton } from "./styled";
-import { Search, Menu, User, LogOut } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 
 interface TopBarProps {
   title?: string;
   onMenuClick?: () => void;
   onUserClick?: () => void;
   onSearch?: (value: string) => void;
-  onLogout?: () => void;
 }
 
-const TopBar: React.FC<TopBarProps> = ({ title = "My App", onMenuClick, onUserClick, onSearch, onLogout }) => {
+const TopBar: React.FC<TopBarProps> = ({ title = "My App", onMenuClick}) => {
+
+  const dispatch = useDispatch();
+
+  const onLogout = () => {
+    dispatch(logout());
+  };
+
   return (
     <TopBarContainer>
       <LeftSection>
