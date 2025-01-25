@@ -11,6 +11,7 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState('login');
 
     const submitForm = async (e: { preventDefault: () => void; }) => {
         setLoading(true);
@@ -22,48 +23,51 @@ const Login = () => {
             });
             if (authenticated) {
                 dispatch(login(authenticated));
-            }else{
+            } else {
                 console.error('Please check your login information.');
-                // swalWithBootstrapButtons.fire(t('Oops.'), t('Please check your login information.'), 'error');
             }
-            setLoading(false);
         } catch (error) {
-            // swalWithBootstrapButtons.fire(t('Oops.'), t('Please check your login information.'), 'error');
             console.error('Login failed:', error);
+        } finally {
             setLoading(false);
         }
     };
 
     return (
         <LoginContainer>
-            <h1>Login</h1>
-            <form onSubmit={submitForm} className="login-form">
-                <div className="form-group">
-                    <label htmlFor="email">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your email"
-                        required
-                    />
+            <div className="login-card">
+                <div className="profile-icon">
+                    <img src="assets/icon.png" alt="Profile" width={60} />
                 </div>
-                <div className="form-group">
-                    <label htmlFor="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter your password"
-                        required
-                    />
-                </div>
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login'}
-                </button>
-            </form>
+                <h1>{activeTab === 'login' ? 'Login' : 'Sign Up'}</h1>
+                <form onSubmit={submitForm} className="login-form">
+                    <div className="form-group">
+                        <label htmlFor="email">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Digite seu e-mail"
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="password">Senha</label>
+                        <input
+                            type="password"
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Digite sua senha"
+                            required
+                        />
+                    </div>
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Entrando em...' : 'Entrar'}
+                    </button>
+                </form>
+            </div>
         </LoginContainer>
     );
 };
