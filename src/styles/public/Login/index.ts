@@ -14,7 +14,7 @@ export const LoginCard = styled.div`
   background: #2c2c2c;
   padding: 2.5rem;
   border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 400px;
   text-align: center;

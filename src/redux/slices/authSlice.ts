@@ -1,4 +1,3 @@
-// @ts-ignore
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
