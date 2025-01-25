@@ -44,7 +44,7 @@ export const ProducerService = {
       if (filters?.page) params.page = filters.page.toString();
       if (ordering) params.ordering = ordering;
 
-      const { data } = await api.get<PaginatedProducerResponse>('/api/producer/', {
+      const { data } = await api.get<PaginatedProducerResponse>('/producer/', {
         params,
         headers: {
           Authorization: `Token ${token}`,
@@ -59,7 +59,7 @@ export const ProducerService = {
 
   async deleteProducer({ token, id }: DeleteProducerParams): Promise<boolean> {
     try {
-      await api.delete(`/api/producer/${id}/`, {
+      await api.delete(`/producer/${id}/`, {
         headers: {
           Authorization: `Token ${token}`,
         },
@@ -73,7 +73,7 @@ export const ProducerService = {
 
   async getProducer({ token, id }: DeleteProducerParams): Promise<Producer | null> {
     try {
-      const { data } = await api.get(`/api/producer/${id}/`, {
+      const { data } = await api.get(`/producer/${id}/`, {
         headers: {
           Authorization: `Token ${token}`,
         },
@@ -87,7 +87,7 @@ export const ProducerService = {
 
   async updateProducer({ token, id, producer }: { token: string; id: string; producer: Producer }): Promise<Producer | null> {
     try {
-      const { data } = await api.put(`/api/producer/${id}/`, producer, {
+      const { data } = await api.put(`/producer/${id}/`, producer, {
         headers: {
           Authorization: `Token ${token}`,
         },
@@ -101,7 +101,7 @@ export const ProducerService = {
 
   async createProducer({ token, producer }: { token: string; producer: Producer }): Promise<Producer | null> {
     try {
-      const { data } = await api.post(`/api/producer/`, producer, {
+      const { data } = await api.post(`/producer/`, producer, {
         headers: {
           Authorization: `Token ${token}`,
         },

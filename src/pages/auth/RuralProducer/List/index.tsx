@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { IRootState } from '../../../../redux/store';
 import TopBar from "../../../../components/TopBar";
 import Sidebar from "../../../../components/Sidebar";
 import { setCurrentPageTitle } from '../../../../redux/slices/themeSlice';
@@ -11,7 +12,8 @@ import {
   ButtonContainer,
 } from "./styles";
 import GenericTable from "../../../../components/GenericTable";
-
+import { ProducerService } from '../../../../services/producers';
+import Modal from '../../../../components/Modal';
 interface Producer {
   cpf_cnpj: string;
   name: string;
@@ -38,6 +40,15 @@ const RuralProducerList: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
+  const [modalTitle, setModalTitle] = useState('');
+  const closeModal = () => setShowModal(false);
+
+  const userAuth = useSelector((state: IRootState) => state.auth);
+
+  const token = userAuth.token; // Replace with actual token retrieval logic
+
   useEffect(() => {
     dispatch(setCurrentPageTitle({ title: 'Produtores Rurais' }));
   }, [dispatch]);
@@ -47,25 +58,39 @@ const RuralProducerList: React.FC = () => {
   }, [currentPage]);
 
   const fetchData = async (page: number) => {
-    const url = `https://your-api.com/producers?page=${page}`;
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Failed to fetch data.");
-      const data = await response.json();
-      setProducers(data.results);
-      setPaginationData({
-        count: data.count,
-        next: data.next,
-        previous: data.previous,
+
+      if (!token) {
+        handleShowModal("Ops!", "User not authenticated.");
+        return;
+      }
+
+      const data = await ProducerService.getProducers({
+        token,
+        filters: { page },
       });
+      if (data) {
+        setProducers(data.results);
+        setPaginationData({
+          count: data.count,
+          next: data.next,
+          previous: data.previous,
+        });
+      }
     } catch (error) {
       setError((error as Error).message);
     } finally {
       setLoading(false);
     }
   };
+
+  const handleShowModal = (title: string, message: string) => {
+    setModalTitle(title);
+    setModalMessage(message);
+    setShowModal(true);
+  }
 
   const handlePageChange = (direction: "next" | "previous") => {
     if (direction === "next" && paginationData.next) {
@@ -75,26 +100,38 @@ const RuralProducerList: React.FC = () => {
     }
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     alert("Create functionality triggered!");
   };
 
-  const handleEdit = (id: string) => {
+  const handleEdit = async (id: string) => {
     alert(`Edit functionality triggered for producer ID: ${id}`);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this producer?")) {
-      alert(`Delete functionality triggered for producer ID: ${id}`);
+
+      if (!token) {
+        handleShowModal("Ops!", "User not authenticated.");
+        return;
+      }
+
+      const success = await ProducerService.deleteProducer({ token, id });
+      if (success) {
+        handleShowModal("Sucesso", "Producer deleted successfully!");
+        fetchData(currentPage);
+      } else {
+        handleShowModal("Ops!", "Failed to delete producer.");
+        setShowModal(true);
+      }
     }
   };
 
   const columns: { header: string; accessor: keyof Producer; render?: (value: string) => string }[] = [
     { header: "CPF/CNPJ", accessor: "cpf_cnpj" },
-    { header: "Name", accessor: "name" },
-    { header: "ID", accessor: "id" },
-    { header: "Created At", accessor: "created_at", render: (value: string) => new Date(value).toLocaleString() },
-    { header: "Updated At", accessor: "updated_at", render: (value: string) => new Date(value).toLocaleString() },
+    { header: "Nome", accessor: "name" },
+    { header: "Criado", accessor: "created_at", render: (value: string) => new Date(value).toLocaleString() },
+    { header: "Atualizado", accessor: "updated_at", render: (value: string) => new Date(value).toLocaleString() },
   ];
 
   return (
@@ -136,6 +173,13 @@ const RuralProducerList: React.FC = () => {
           </PaginationContainer>
         </MainContent>
       </ContentArea>
+      {showModal && (
+        <Modal
+          title={modalTitle}
+          message={modalMessage}
+          onClose={closeModal}
+        />
+      )}
     </RuralProducerListContainer>
   );
 };
