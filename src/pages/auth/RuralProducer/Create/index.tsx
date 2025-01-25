@@ -44,35 +44,33 @@ const RuralProducerCreate: React.FC = () => {
     setSuccessMessage(null);
 
     if (!cpfCnpj || !name) {
-      setError("Todos os campos são obrigatórios.");
-      return;
+        setError("Todos os campos são obrigatórios.");
+        return;
     }
 
     setLoading(true);
 
     try {
-      if (!token) {
-        setError("Usuario não autenticado.");
-        return;
-      }
-      const success = await ProducerService.createProducer({
-        token,
-        producer:{
-          cpf_cnpj: cpfCnpj,
-          name,
+        if (!token) {
+            setError("Usuário não autenticado.");
+            return;
         }
-      });
+        const producer = await ProducerService.createProducer({
+            token,
+            producer: {
+                cpf_cnpj: cpfCnpj,
+                name,
+            },
+        });
 
-      if (success) {
-        setSuccessMessage("Produtor cadastrado com sucesso!");
-        navigate("/rural-producer-list");
-      } else {
-        setError("Erro ao cadastrar o produtor.");
-      }
+        if (producer) {
+            setSuccessMessage("Produtor cadastrado com sucesso!");
+            navigate("/rural-producer-list");
+        }
     } catch (err) {
-      setError((err as Error).message);
+        setError(err.message);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
 
@@ -84,7 +82,6 @@ const RuralProducerCreate: React.FC = () => {
         <MainContent>
           <FormContainer>
             <FormTitle>Cadastrar Produtor Rural</FormTitle>
-            {error && <p style={{ color: "red" }}>{error}</p>}
             {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
             <form onSubmit={handleFormSubmit}>
               <FormField>

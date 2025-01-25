@@ -6,7 +6,7 @@ export const SidebarContainer = styled.div`
   background-color: #2c2c2c;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: unset;
   padding: 1rem;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
 `;

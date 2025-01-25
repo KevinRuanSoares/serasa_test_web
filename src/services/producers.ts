@@ -105,15 +105,19 @@ export const ProducerService = {
 
   async createProducer({ token, producer }: { token: string; producer: ProducerCreateParams }): Promise<Producer | null> {
     try {
-      const { data } = await api.post(`/producer/`, producer, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      });
-      return data;
-    } catch (error) {
-      console.error("Error creating producer:", error);
-      return null;
+        const { data } = await api.post(`/producer/`, producer, {
+            headers: {
+                Authorization: `Token ${token}`,
+            },
+        });
+        return data;
+    } catch (error: any) {
+        // Handle specific validation error for CPF/CNPJ
+        if (error.response && error.response.data?.cpf_cnpj) {
+            throw new Error(error.response.data.cpf_cnpj[0]);
+        }
+        console.error("Error creating producer:", error);
+        throw new Error("Erro ao criar o produtor.");
     }
-  },
+  }
 };
