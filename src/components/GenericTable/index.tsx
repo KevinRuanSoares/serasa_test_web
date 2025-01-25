@@ -1,5 +1,5 @@
 import React from "react";
-import { StyledTable } from "./styles";
+import { StyledTable, TableContainer } from "./styles";
 
 interface Column<T> {
   header: string; // Column header name
@@ -21,32 +21,35 @@ const GenericTable = <T,>({
   remove,
 }: GenericTableProps<T>): React.ReactElement => {
   return (
-    <StyledTable>
-      <thead>
-        <tr>
-          {columns.map((col, index) => (
-            <th key={index}>{col.header}</th>
-          ))}
-          {edit && <th>Editar</th>}
-          {remove && <th>Remover</th>}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((row, rowIndex) => (
-          <tr key={rowIndex}>
-            {columns.map((col, colIndex) => (
-              <td key={colIndex}>
-                {col.render
-                  ? col.render(row[col.accessor], row)
-                  : row[col.accessor]?.toString()}
-              </td>
+    <TableContainer>
+
+      <StyledTable>
+        <thead>
+          <tr>
+            {columns.map((col, index) => (
+              <th key={index}>{col.header}</th>
             ))}
-            {edit && <td style={{textAlign: 'center'}}>{edit(row)}</td>}
-            {remove && <td style={{justifyContent: 'center'}}>{remove(row)}</td>}
+            {edit && <th>Editar</th>}
+            {remove && <th>Remover</th>}
           </tr>
-        ))}
-      </tbody>
-    </StyledTable>
+        </thead>
+        <tbody>
+          {data.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {columns.map((col, colIndex) => (
+                <td key={colIndex}>
+                  {col.render
+                    ? col.render(row[col.accessor], row)
+                    : row[col.accessor]?.toString()}
+                </td>
+              ))}
+              {edit && <td style={{textAlign: 'center'}}>{edit(row)}</td>}
+              {remove && <td style={{justifyContent: 'center'}}>{remove(row)}</td>}
+            </tr>
+          ))}
+        </tbody>
+      </StyledTable>
+    </TableContainer>
   );
 };
 

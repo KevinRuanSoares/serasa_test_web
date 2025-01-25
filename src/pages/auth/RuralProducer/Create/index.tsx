@@ -1,30 +1,124 @@
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+// src/pages/RuralProducerCreate/index.tsx
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { IRootState } from '../../../../redux/store';
+import { useNavigate } from "react-router-dom";
 import TopBar from "../../../../components/TopBar";
 import Sidebar from "../../../../components/Sidebar";
-import { setCurrentPageTitle } from '../../../../redux/slices/themeSlice';
-import { RuralProducerCreateContainer, ContentArea, MainContent } from "./styles";
+import {
+  RuralProducerListContainer,
+  ContentArea,
+  MainContent,
+  ButtonContainer,
+} from "./styles";
+import { setCurrentPageTitle } from "../../../../redux/slices/themeSlice";
+import { ProducerService } from "../../../../services/producers";
+import Modal from "../../../../components/Modal";
+import {
+  FormContainer,
+  FormField,
+  FormInput,
+  FormLabel,
+  FormTitle,
+} from "./styledForm";
 
-const Dashboard = () => {
-
+const RuralProducerCreate: React.FC = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [cpfCnpj, setCpfCnpj] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const userAuth = useSelector((state: IRootState) => state.auth);
+  const token = userAuth.token;
 
   useEffect(() => {
-    dispatch(setCurrentPageTitle({ title: 'Registrar Produtores Rurais' }));
+    dispatch(setCurrentPageTitle({ title: "Cadastrar Produtor Rural" }));
   }, [dispatch]);
 
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccessMessage(null);
+
+    if (!cpfCnpj || !name) {
+      setError("Todos os campos são obrigatórios.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      if (!token) {
+        setError("Usuario não autenticado.");
+        return;
+      }
+      const success = await ProducerService.createProducer({
+        token,
+        producer:{
+          cpf_cnpj: cpfCnpj,
+          name,
+        }
+      });
+
+      if (success) {
+        setSuccessMessage("Produtor cadastrado com sucesso!");
+        navigate("/rural-producer-list");
+      } else {
+        setError("Erro ao cadastrar o produtor.");
+      }
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <RuralProducerCreateContainer>
-      <Sidebar/>
+    <RuralProducerListContainer>
+      <Sidebar />
       <ContentArea>
-        <TopBar/>
+        <TopBar />
         <MainContent>
-          <h1>Welcome to the Registrar Produtores Rurais</h1>
-          <p>Here is your main content area.</p>
+          <FormContainer>
+            <FormTitle>Cadastrar Produtor Rural</FormTitle>
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+            <form onSubmit={handleFormSubmit}>
+              <FormField>
+                <FormLabel htmlFor="cpfCnpj">CPF/CNPJ:</FormLabel>
+                <FormInput
+                  id="cpfCnpj"
+                  type="text"
+                  value={cpfCnpj}
+                  onChange={(e) => setCpfCnpj(e.target.value)}
+                  placeholder="Digite o CPF ou CNPJ"
+                />
+              </FormField>
+              <FormField>
+                <FormLabel htmlFor="name">Nome:</FormLabel>
+                <FormInput
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Digite o nome"
+                />
+              </FormField>
+              <ButtonContainer>
+                <button type="submit" disabled={loading}>
+                  {loading ? "Salvando..." : "Cadastrar"}
+                </button>
+              </ButtonContainer>
+            </form>
+          </FormContainer>
         </MainContent>
       </ContentArea>
-    </RuralProducerCreateContainer>
+      {error && <Modal title="Ops!" message={error} onClose={() => setError(null)} />}
+    </RuralProducerListContainer>
   );
 };
 
-export default Dashboard;
+export default RuralProducerCreate;

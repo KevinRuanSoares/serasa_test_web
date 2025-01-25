@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../../../redux/store';
+import { useNavigate } from 'react-router-dom';
 import TopBar from "../../../../components/TopBar";
 import Sidebar from "../../../../components/Sidebar";
 import { Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
@@ -56,7 +57,10 @@ const RuralProducerList: React.FC = () => {
   const [deleteProducerId, setDeleteProducerId] = useState<string | null>(null);
 
   const userAuth = useSelector((state: IRootState) => state.auth);
-  const token = userAuth.token; // Replace with actual token retrieval logic
+  const token = userAuth.token;
+
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     dispatch(setCurrentPageTitle({ title: 'Produtores Rurais' }));
@@ -133,7 +137,7 @@ const RuralProducerList: React.FC = () => {
   };
 
   const handleCreate = async () => {
-    alert("Create functionality triggered!");
+    navigate('/rural-producer-create')
   };
 
   const handleEdit = async (id: string) => {
@@ -153,7 +157,6 @@ const RuralProducerList: React.FC = () => {
       <ContentArea>
         <TopBar />
         <MainContent>
-          <h1>Produtores Rurais</h1>
           <ButtonContainer>
             <button onClick={handleCreate}>+ Cadastrar Produtor</button>
           </ButtonContainer>

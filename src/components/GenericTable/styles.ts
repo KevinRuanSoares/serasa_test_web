@@ -1,14 +1,20 @@
 import styled from "styled-components";
 
+export const TableContainer = styled.div`
+  max-height: 500px; /* Ajuste o valor para limitar a altura da tabela */
+  overflow-y: auto; /* Habilita o scroll vertical */
+  overflow-x: auto; /* Habilita o scroll horizontal, caso necessário */
+  // border-radius: 12px;
+  // box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+`;
+
 export const StyledTable = styled.table`
   width: 100%;
   border-collapse: collapse;
-  margin: 20px 0;
+  margin: 0;
   font-size: 0.9rem;
   background-color: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 
   th, td {
     text-align: left;

@@ -1,5 +1,4 @@
 import api from '../api';
-import { AxiosError } from 'axios';
 
 export interface Producer {
   id: string;
@@ -32,6 +31,11 @@ interface GetProducersParams {
 interface DeleteProducerParams {
   id: string;
   token: string;
+}
+
+export interface ProducerCreateParams {
+  cpf_cnpj: string;
+  name: string;
 }
 
 export const ProducerService = {
@@ -99,7 +103,7 @@ export const ProducerService = {
     }
   },
 
-  async createProducer({ token, producer }: { token: string; producer: Producer }): Promise<Producer | null> {
+  async createProducer({ token, producer }: { token: string; producer: ProducerCreateParams }): Promise<Producer | null> {
     try {
       const { data } = await api.post(`/producer/`, producer, {
         headers: {

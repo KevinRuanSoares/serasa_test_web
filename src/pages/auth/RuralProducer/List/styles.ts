@@ -3,13 +3,14 @@ import styled from 'styled-components';
 export const RuralProducerListContainer = styled.div`
   display: flex;
   height: 100vh;
+  background-color: #fff !important;
 `;
 
 export const ContentArea = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: #f9f9f9;
+  background-color: #fff  !important;
 `;
 
 export const MainContent = styled.main`
@@ -75,14 +76,14 @@ export const PaginationContainer = styled.div`
     padding: 10px 15px;
     border: none;
     border-radius: 5px;
-    background-color: #007bff;
+    background-color: #28a745;
     color: white;
     font-size: 0.9rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
 
     &:hover {
-      background-color: #0056b3;
+      background-color:rgb(26, 110, 46);
     }
 
     &:disabled {
