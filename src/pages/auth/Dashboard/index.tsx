@@ -1,8 +1,10 @@
+import TopBar from "../../../components/TopBar";
+
 const Dashboard = () => {
     
     return (
         <div>
-            <h1>Dashboard</h1>
+            <TopBar title="Dashboard" />
         </div>
     );
 };

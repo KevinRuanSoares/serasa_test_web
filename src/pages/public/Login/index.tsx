@@ -53,7 +53,7 @@ const Login = () => {
     <LoginContainer>
       <LoginCard>
         <ProfileIcon>
-          <img src="assets/icon.png" alt="Profile" width={60} />
+          <img src="assets/icon.png" alt="ProfProfile" width={60} />
         </ProfileIcon>
         <Title>Login</Title>
         <LoginForm onSubmit={submitForm}>

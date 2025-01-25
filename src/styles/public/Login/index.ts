@@ -7,7 +7,6 @@ export const LoginContainer = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: #057C3D;
   font-family: 'Poppins', sans-serif;
 `;
 
