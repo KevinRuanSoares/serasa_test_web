@@ -1,7 +1,7 @@
 // src/pages/RuralProducerCreate/index.tsx
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from 'react-redux';
-import { IRootState } from '../../../../redux/store';
+import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "../../../../redux/store";
 import { useNavigate } from "react-router-dom";
 import TopBar from "../../../../components/TopBar";
 import Sidebar from "../../../../components/Sidebar";
@@ -44,38 +44,62 @@ const RuralProducerCreate: React.FC = () => {
     setSuccessMessage(null);
 
     if (!cpfCnpj || !name) {
-        setError("Todos os campos são obrigatórios.");
-        return;
+      setError("Todos os campos são obrigatórios.");
+      return;
     }
 
     setLoading(true);
 
     try {
-        if (!token) {
-            setError("Usuário não autenticado.");
-            return;
-        }
-        const producer = await ProducerService.createProducer({
-            token,
-            producer: {
-                cpf_cnpj: cpfCnpj,
-                name,
-            },
-        });
+      if (!token) {
+        setError("Usuário não autenticado.");
+        return;
+      }
+      const producer = await ProducerService.createProducer({
+        token,
+        producer: {
+          cpf_cnpj: cpfCnpj,
+          name,
+        },
+      });
 
-        if (producer) {
-            setSuccessMessage("Produtor cadastrado com sucesso!");
-            navigate("/rural-producer-list");
-        }
+      if (producer) {
+        setSuccessMessage("Produtor cadastrado com sucesso!");
+        navigate("/rural-producer-list");
+      }
     } catch (err) {
-        if (err instanceof Error) {
-            setError(err.message);
-        } else {
-            setError("An unknown error occurred.");
-        }
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred.");
+      }
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
+  };
+
+  const handleCpfCnpjChange = (value: string) => {
+    // Remove caracteres não numéricos
+    const numericValue = value.replace(/\D/g, "");
+
+    // Aplica máscara de CPF ou CNPJ
+    let formattedValue = numericValue;
+    if (numericValue.length <= 11) {
+      // CPF: 000.000.000-00
+      formattedValue = numericValue
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    } else {
+      // CNPJ: 00.000.000/0000-00
+      formattedValue = numericValue
+        .replace(/(\d{2})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d{1,4})$/, "$1/$2")
+        .replace(/(\d{4})(\d{1,2})$/, "$1-$2");
+    }
+
+    setCpfCnpj(formattedValue);
   };
 
   return (
@@ -86,7 +110,9 @@ const RuralProducerCreate: React.FC = () => {
         <MainContent>
           <FormContainer>
             <FormTitle>Cadastrar Produtor Rural</FormTitle>
-            {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+            {successMessage && (
+              <p style={{ color: "green" }}>{successMessage}</p>
+            )}
             <form onSubmit={handleFormSubmit}>
               <FormField>
                 <FormLabel htmlFor="cpfCnpj">CPF/CNPJ:</FormLabel>
@@ -94,8 +120,9 @@ const RuralProducerCreate: React.FC = () => {
                   id="cpfCnpj"
                   type="text"
                   value={cpfCnpj}
-                  onChange={(e) => setCpfCnpj(e.target.value)}
+                  onChange={(e) => handleCpfCnpjChange(e.target.value)}
                   placeholder="Digite o CPF ou CNPJ"
+                  maxLength={18} // Limita o tamanho máximo da máscara
                 />
               </FormField>
               <FormField>
@@ -117,7 +144,13 @@ const RuralProducerCreate: React.FC = () => {
           </FormContainer>
         </MainContent>
       </ContentArea>
-      {error && <Modal title="Ops!" message={error} onClose={() => setError(null)} />}
+      {error && (
+        <Modal
+          title="Ops!"
+          message={error}
+          onClose={() => setError(null)}
+        />
+      )}
     </RuralProducerCreateContainer>
   );
 };
