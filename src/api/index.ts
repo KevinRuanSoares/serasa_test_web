@@ -9,13 +9,13 @@ const env = import.meta.env.VITE_ENVIRONMENT as 'production' | 'homologation' | 
 
 export const ENVIRONMENT = {
   production: {
-    url: 'https://sgai.globalsgc.com',
+    url: 'https://brain.agriculture.kevinsoares.com.br',
   },
   homologation: {
-    url: 'https://sgai.homologation.globalsgc.com',
+    url: 'https://brain.agriculture.kevinsoares.com.br',
   },
   development: {
-    url: 'https://healthy-model-sloth.ngrok-free.app',
+    url: 'https://brain.agriculture.kevinsoares.com.br',
   },
 };
 

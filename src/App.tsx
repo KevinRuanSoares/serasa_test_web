@@ -1,12 +1,10 @@
-import { PropsWithChildren, useEffect } from 'react';
-import { IRootState } from './redux/store';
-import store from './redux/store';
+import { PropsWithChildren } from 'react';
 
 function App({ children }: PropsWithChildren) {
     return (
-        <div>
+        <>
             {children}
-        </div>
+        </>
     );
 }
 
