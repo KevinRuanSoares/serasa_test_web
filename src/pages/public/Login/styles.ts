@@ -1,4 +1,3 @@
-// src/styles/public/Login/index.ts
 import styled from 'styled-components';
 
 export const LoginContainer = styled.div`
@@ -8,6 +7,7 @@ export const LoginContainer = styled.div`
   align-items: center;
   height: 100vh;
   font-family: 'Poppins', sans-serif;
+  position: relative;
 `;
 
 export const LoginCard = styled.div`
@@ -92,22 +92,13 @@ export const SubmitButton = styled.button`
   }
 `;
 
-export const FormFooter = styled.div`
-  margin-top: 1rem;
-  text-align: center;
+export const VersionLabel = styled.div`
+  position: absolute;
+  bottom: 20px;
   font-size: 0.85rem;
-  color: #cccccc;
-
-  a {
-    color: #057C3D;
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s;
-
-    &:hover {
-      color: #04562F;
-    }
-  }
+  color: #2c2c2c;
+  text-align: center;
+  font-weight: bold;
 `;
 
 export const Title = styled.h1`
@@ -115,40 +106,4 @@ export const Title = styled.h1`
   margin-bottom: 0.5rem;
   font-size: 1.8rem;
   color: #ffffff;
-`;
-
-export const TabSwitch = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-
-  span {
-    font-size: 1rem;
-    font-weight: bold;
-    color: #cccccc;
-    margin: 0 1rem;
-    cursor: pointer;
-    transition: color 0.3s;
-
-    &.active {
-      color: #057C3D;
-      border-bottom: 2px solid #057C3D;
-    }
-
-    &:hover {
-      color: #057C3D;
-    }
-  }
-`;
-
-// Responsividade
-export const ResponsiveContainer = styled.div`
-  @media (max-width: 768px) {
-    padding: 1rem;
-
-    ${LoginCard} {
-      padding: 2rem;
-    }
-  }
 `;

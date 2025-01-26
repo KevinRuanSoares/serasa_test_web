@@ -1,4 +1,3 @@
-// src/components/Login/index.tsx
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -13,7 +12,9 @@ import {
   FormGroup,
   SubmitButton,
   Title,
+  VersionLabel,
 } from './styles';
+import { version } from '../../../../package.json';
 
 import Modal from '../../../components/Modal';
 
@@ -92,6 +93,8 @@ const Login = () => {
           onClose={closeModal}
         />
       )}
+
+      <VersionLabel>Versão {version}</VersionLabel>
     </LoginContainer>
   );
 };
