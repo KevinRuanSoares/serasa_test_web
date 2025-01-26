@@ -5,6 +5,9 @@ const Dashboard = lazy(() => import('../pages/auth/Dashboard'));
 const RuralProducerCreate = lazy(() => import('../pages/auth/RuralProducer/Create'));
 const RuralProducerList = lazy(() => import('../pages/auth/RuralProducer/List'));
 const RuralProducerUpdate = lazy(() => import('../pages/auth/RuralProducer/Update'));
+const FarmCreate = lazy(() => import('../pages/auth/Farm/Create'));
+const FarmList = lazy(() => import('../pages/auth/Farm/List'));
+const FarmUpdate = lazy(() => import('../pages/auth/Farm/Update'));
 
 const routes = [
     // Public routes
@@ -45,6 +48,25 @@ const routes = [
         layout: 'default',
         protected: true,
     },
+    {
+        path: '/farm-list',
+        element: <FarmList />,
+        layout: 'default',
+        protected: true,
+    },
+    {
+        path: '/farm-create',
+        element: <FarmCreate />,
+        layout: 'default',
+        protected: true,
+    },
+    {
+        path: '/farm-update',
+        element: <FarmUpdate />,
+        layout: 'default',
+        protected: true,
+    }
+
 
 ];
 

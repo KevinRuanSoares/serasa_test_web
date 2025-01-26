@@ -44,6 +44,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
                 <List size={20} />
                 <span>Produtores Rurais</span>
               </NavItem>
+              <NavItem
+                onClick={() => {
+                  navigate('/farm-list');
+                }}
+              >
+                <List size={20} />
+                <span>Fazendas</span>
+              </NavItem>
             </NavSection>
             <LogoutSection>
             </LogoutSection>
