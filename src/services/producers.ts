@@ -89,7 +89,7 @@ export const ProducerService = {
     }
   },
 
-  async updateProducer({ token, id, producer }: { token: string; id: string; producer: Producer }): Promise<Producer | null> {
+  async updateProducer({ token, id, producer }: { token: string; id: string; producer: ProducerCreateParams }): Promise<Producer | null> {
     try {
       const { data } = await api.put(`/producer/${id}/`, producer, {
         headers: {
@@ -97,9 +97,13 @@ export const ProducerService = {
         },
       });
       return data;
-    } catch (error) {
-      console.error(`Error updating producer with id ${id}:`, error);
-      return null;
+    } catch (error: any) {
+      // Handle specific validation error for CPF/CNPJ
+      if (error.response && error.response.data?.cpf_cnpj) {
+          throw new Error(error.response.data.cpf_cnpj[0]);
+      }
+      console.error("Error creating producer:", error);
+      throw new Error("Erro ao criar o produtor.");
     }
   },
 

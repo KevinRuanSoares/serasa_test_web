@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../../../redux/store';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import TopBar from "../../../../components/TopBar";
 import Sidebar from "../../../../components/Sidebar";
 import {
@@ -31,6 +31,9 @@ const RuralProducerUpdate: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const location = useLocation(); // Access the current URL location
+  const [producerId, setProducerId] = useState<string | null>(null);
+
   const userAuth = useSelector((state: IRootState) => state.auth);
   const token = userAuth.token;
 
@@ -55,8 +58,13 @@ const RuralProducerUpdate: React.FC = () => {
             setError("Usuário não autenticado.");
             return;
         }
-        const producer = await ProducerService.createProducer({
+        if (!producerId) {
+          setError("ID do produtor não informado. 002");
+          return;
+        }
+        const producer = await ProducerService.updateProducer({
             token,
+            id: producerId,
             producer: {
                 cpf_cnpj: cpfCnpj,
                 name,
@@ -64,7 +72,7 @@ const RuralProducerUpdate: React.FC = () => {
         });
 
         if (producer) {
-            setSuccessMessage("Produtor cadastrado com sucesso!");
+            setSuccessMessage("Produtor atualizado com sucesso!");
             navigate("/rural-producer-list");
         }
     } catch (err) {
@@ -77,6 +85,49 @@ const RuralProducerUpdate: React.FC = () => {
         setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const id = queryParams.get("id");
+    if (id) {
+      setProducerId(id);
+    }
+  }, [location.search]);
+
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    if (!producerId) {
+      return
+    }
+    const fetchProducer = async () => {
+        try {
+            if (!token) {
+                setError("Usuário não autenticado.");
+                return;
+            }
+
+            if (!producerId) {
+                setError("ID do produtor não informado. 001");
+                return;
+            }
+            const producer = await ProducerService.getProducer({
+                token,
+                id: producerId,
+            });
+
+            if (producer) {
+                setCpfCnpj(producer.cpf_cnpj);
+                setName(producer.name);
+            }
+        } catch (err) {
+            setError("Erro ao carregar os dados do produtor.");
+        }
+    };
+
+    fetchProducer();
+  }, [token, producerId]);
 
   return (
     <RuralProducerUpdateContainer>
