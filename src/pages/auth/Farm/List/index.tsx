@@ -26,6 +26,7 @@ interface Farm {
   total_area: number;
   arable_area: number;
   vegetation_area: number;
+  producer_name: string;
   created_at: string;
   updated_at: string;
 }
@@ -155,6 +156,7 @@ const FarmList: React.FC = () => {
     { header: "Área Total", accessor: "total_area" },
     { header: "Área Agricultável", accessor: "arable_area" },
     { header: "Área de Vegetação", accessor: "vegetation_area" },
+    { header: "Produtor", accessor: "producer_name" },
     {
       header: "Criado",
       accessor: "created_at",

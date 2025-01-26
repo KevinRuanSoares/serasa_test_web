@@ -9,6 +9,7 @@ export interface Farm {
   arable_area: number;
   vegetation_area: number;
   producer: string; // Producer ID
+  producer_name: string; // Producer ID
   created_at: string;
   updated_at: string;
 }
