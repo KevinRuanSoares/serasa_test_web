@@ -73,3 +73,20 @@ export const FormInput = styled.input`
     color: #aaa;
   }
 `;
+
+export const FormSelect = styled.select`
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #f9f9f9;
+  outline: none;
+  transition: border-color 0.3s;
+  appearance: none; /* Remove default select styling */
+
+  &:focus {
+    border-color: #28a745;
+    background: #fff;
+  }
+`;

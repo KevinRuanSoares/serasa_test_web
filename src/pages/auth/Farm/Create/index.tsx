@@ -12,6 +12,7 @@ import {
 } from "./styles";
 import { setCurrentPageTitle } from "../../../../redux/slices/themeSlice";
 import { FarmService } from "../../../../services/farms";
+import { ProducerService, Producer } from "../../../../services/producers";
 import Modal from "../../../../components/Modal";
 import {
   FormContainer,
@@ -20,6 +21,7 @@ import {
   FormLabel,
   FormTitle,
   FormRow,
+  FormSelect,
 } from "./styledForm";
 
 const FarmCreate: React.FC = () => {
@@ -32,6 +34,7 @@ const FarmCreate: React.FC = () => {
   const [arableArea, setArableArea] = useState("");
   const [vegetationArea, setVegetationArea] = useState("");
   const [producerId, setProducerId] = useState("");
+  const [producers, setProducers] = useState<Producer[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -42,6 +45,23 @@ const FarmCreate: React.FC = () => {
   useEffect(() => {
     dispatch(setCurrentPageTitle({ title: "Cadastrar Fazenda" }));
   }, [dispatch]);
+
+  useEffect(() => {
+    const fetchProducers = async () => {
+      if (!token) return;
+      try {
+        const response = await ProducerService.getProducers({ token });
+        if (response && response.results) {
+          setProducers(response.results);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar produtores:", err);
+        setError("Erro ao carregar a lista de produtores.");
+      }
+    };
+
+    fetchProducers();
+  }, [token]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,14 +187,19 @@ const FarmCreate: React.FC = () => {
               </FormRow>
               <FormRow>
                 <FormField>
-                  <FormLabel htmlFor="producerId">ID do Produtor:</FormLabel>
-                  <FormInput
+                  <FormLabel htmlFor="producerId">Produtor:</FormLabel>
+                  <FormSelect
                     id="producerId"
-                    type="text"
                     value={producerId}
                     onChange={(e) => setProducerId(e.target.value)}
-                    placeholder="Digite o ID do produtor"
-                  />
+                  >
+                    <option value="">Selecione um produtor</option>
+                    {producers.map((producer) => (
+                      <option key={producer.id} value={producer.id}>
+                        {producer.name} - {producer.cpf_cnpj}
+                      </option>
+                    ))}
+                  </FormSelect>
                 </FormField>
               </FormRow>
               <ButtonContainer>

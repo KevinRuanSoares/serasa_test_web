@@ -105,7 +105,7 @@ export const ButtonContainer = styled.div`
 
   button {
     padding: 10px 15px;
-    background-color: #ffcc00;
+    background-color: #28a745;
     color: white;
     border: none;
     border-radius: 5px;
@@ -114,7 +114,7 @@ export const ButtonContainer = styled.div`
     transition: background-color 0.3s ease;
 
     &:hover {
-      background-color: #e6b800;
+      background-color: #218838;
     }
   }
 `;

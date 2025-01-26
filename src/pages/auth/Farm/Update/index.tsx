@@ -13,6 +13,7 @@ import {
 } from "./styles";
 import { setCurrentPageTitle } from "../../../../redux/slices/themeSlice";
 import { FarmService } from "../../../../services/farms";
+import { ProducerService, Producer } from "../../../../services/producers";
 import Modal from "../../../../components/Modal";
 import {
   FormContainer,
@@ -20,6 +21,8 @@ import {
   FormInput,
   FormLabel,
   FormTitle,
+  FormRow,
+  FormSelect,
 } from "./styledForm";
 
 const FarmUpdate: React.FC = () => {
@@ -34,6 +37,7 @@ const FarmUpdate: React.FC = () => {
   const [arableArea, setArableArea] = useState("");
   const [vegetationArea, setVegetationArea] = useState("");
   const [producerId, setProducerId] = useState("");
+  const [producers, setProducers] = useState<Producer[]>([]);
 
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -45,6 +49,24 @@ const FarmUpdate: React.FC = () => {
   useEffect(() => {
     dispatch(setCurrentPageTitle({ title: "Editar Fazenda" }));
   }, [dispatch]);
+
+
+  useEffect(() => {
+    const fetchProducers = async () => {
+      if (!token) return;
+      try {
+        const response = await ProducerService.getProducers({ token });
+        if (response && response.results) {
+          setProducers(response.results);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar produtores:", err);
+        setError("Erro ao carregar a lista de produtores.");
+      }
+    };
+
+    fetchProducers();
+  }, [token]);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -134,77 +156,89 @@ const FarmUpdate: React.FC = () => {
             <FormTitle>Editar Fazenda</FormTitle>
             {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
             <form onSubmit={handleFormSubmit}>
-              <FormField>
-                <FormLabel htmlFor="name">Nome:</FormLabel>
-                <FormInput
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Digite o nome da fazenda"
-                />
-              </FormField>
-              <FormField>
-                <FormLabel htmlFor="city">Cidade:</FormLabel>
-                <FormInput
-                  id="city"
-                  type="text"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  placeholder="Digite a cidade"
-                />
-              </FormField>
-              <FormField>
-                <FormLabel htmlFor="state">Estado:</FormLabel>
-                <FormInput
-                  id="state"
-                  type="text"
-                  value={state}
-                  onChange={(e) => setState(e.target.value)}
-                  placeholder="Digite o estado"
-                />
-              </FormField>
-              <FormField>
-                <FormLabel htmlFor="totalArea">Área Total (ha):</FormLabel>
-                <FormInput
-                  id="totalArea"
-                  type="number"
-                  value={totalArea}
-                  onChange={(e) => setTotalArea(e.target.value)}
-                  placeholder="Digite a área total"
-                />
-              </FormField>
-              <FormField>
-                <FormLabel htmlFor="arableArea">Área Agricultável (ha):</FormLabel>
-                <FormInput
-                  id="arableArea"
-                  type="number"
-                  value={arableArea}
-                  onChange={(e) => setArableArea(e.target.value)}
-                  placeholder="Digite a área agricultável"
-                />
-              </FormField>
-              <FormField>
-                <FormLabel htmlFor="vegetationArea">Área de Vegetação (ha):</FormLabel>
-                <FormInput
-                  id="vegetationArea"
-                  type="number"
-                  value={vegetationArea}
-                  onChange={(e) => setVegetationArea(e.target.value)}
-                  placeholder="Digite a área de vegetação"
-                />
-              </FormField>
-              <FormField>
-                <FormLabel htmlFor="producerId">ID do Produtor:</FormLabel>
-                <FormInput
-                  id="producerId"
-                  type="text"
-                  value={producerId}
-                  onChange={(e) => setProducerId(e.target.value)}
-                  placeholder="Digite o ID do produtor"
-                  disabled
-                />
-              </FormField>
+              <FormRow>
+                <FormField>
+                  <FormLabel htmlFor="name">Nome:</FormLabel>
+                  <FormInput
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Digite o nome da fazenda"
+                  />
+                </FormField>
+                <FormField>
+                  <FormLabel htmlFor="city">Cidade:</FormLabel>
+                  <FormInput
+                    id="city"
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="Digite a cidade"
+                  />
+                </FormField>
+              </FormRow>
+              <FormRow>
+                <FormField>
+                  <FormLabel htmlFor="state">Estado:</FormLabel>
+                  <FormInput
+                    id="state"
+                    type="text"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    placeholder="Digite o estado"
+                  />
+                </FormField>
+                <FormField>
+                  <FormLabel htmlFor="totalArea">Área Total (ha):</FormLabel>
+                  <FormInput
+                    id="totalArea"
+                    type="number"
+                    value={totalArea}
+                    onChange={(e) => setTotalArea(e.target.value)}
+                    placeholder="Digite a área total"
+                  />
+                </FormField>
+              </FormRow>
+              <FormRow>
+                <FormField>
+                  <FormLabel htmlFor="arableArea">Área Agricultável (ha):</FormLabel>
+                  <FormInput
+                    id="arableArea"
+                    type="number"
+                    value={arableArea}
+                    onChange={(e) => setArableArea(e.target.value)}
+                    placeholder="Digite a área agricultável"
+                  />
+                </FormField>
+                <FormField>
+                  <FormLabel htmlFor="vegetationArea">Área de Vegetação (ha):</FormLabel>
+                  <FormInput
+                    id="vegetationArea"
+                    type="number"
+                    value={vegetationArea}
+                    onChange={(e) => setVegetationArea(e.target.value)}
+                    placeholder="Digite a área de vegetação"
+                  />
+                </FormField>
+              </FormRow>
+              <FormRow>
+                <FormField>
+                  <FormLabel htmlFor="producerId">Produtor:</FormLabel>
+                  <FormSelect
+                    id="producerId"
+                    value={producerId}
+                    onChange={(e) => setProducerId(e.target.value)}
+                  >
+                    <option value="">Selecione um produtor</option>
+                    {producers.map((producer) => (
+                      <option key={producer.id} value={producer.id}>
+                        {producer.name} - {producer.cpf_cnpj}
+                      </option>
+                    ))}
+                  </FormSelect>
+                </FormField>
+              </FormRow>
               <ButtonContainer>
                 <button type="submit" disabled={loading}>
                   {loading ? "Salvando..." : "Editar"}
