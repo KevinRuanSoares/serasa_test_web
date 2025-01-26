@@ -1,14 +1,18 @@
-// src/pages/FarmCreate/styledForm.ts
 import styled from "styled-components";
 
 export const FormContainer = styled.div`
-  // max-width: 500px;
+  // max-width: 90%;
   margin: 0 auto;
   padding: 30px;
   background: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  @media (min-width: 768px) {
+    // max-width: 700px;
+  }
 `;
 
 export const FormTitle = styled.h2`
@@ -20,7 +24,26 @@ export const FormTitle = styled.h2`
 `;
 
 export const FormField = styled.div`
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   margin-bottom: 20px;
+
+  &:nth-child(even) {
+    margin-left: 20px;
+  }
+`;
+
+export const FormRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 10px;
+  }
 `;
 
 export const FormLabel = styled.label`
