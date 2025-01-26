@@ -21,7 +21,7 @@ export const ENVIRONMENT = {
 
 const { url } = ENVIRONMENT[env];
 
-let api = axios.create({
+const api = axios.create({
   baseURL: url + '/api',
   timeout: 60000,
   headers: {
