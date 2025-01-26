@@ -1,7 +1,7 @@
 // src/pages/FarmUpdate/index.tsx
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from 'react-redux';
-import { IRootState } from '../../../../redux/store';
+import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "../../../../redux/store";
 import { useNavigate, useLocation } from "react-router-dom";
 import TopBar from "../../../../components/TopBar";
 import Sidebar from "../../../../components/Sidebar";
@@ -12,7 +12,7 @@ import {
   ButtonContainer,
 } from "./styles";
 import { setCurrentPageTitle } from "../../../../redux/slices/themeSlice";
-import { ProducerService } from "../../../../services/producers";
+import { FarmService } from "../../../../services/farms";
 import Modal from "../../../../components/Modal";
 import {
   FormContainer,
@@ -25,14 +25,19 @@ import {
 const FarmUpdate: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [cpfCnpj, setCpfCnpj] = useState("");
+  const location = useLocation();
+  const [farmId, setFarmId] = useState<string | null>(null);
   const [name, setName] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [totalArea, setTotalArea] = useState("");
+  const [arableArea, setArableArea] = useState("");
+  const [vegetationArea, setVegetationArea] = useState("");
+  const [producerId, setProducerId] = useState("");
+
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const location = useLocation(); // Access the current URL location
-  const [producerId, setProducerId] = useState<string | null>(null);
 
   const userAuth = useSelector((state: IRootState) => state.auth);
   const token = userAuth.token;
@@ -41,93 +46,83 @@ const FarmUpdate: React.FC = () => {
     dispatch(setCurrentPageTitle({ title: "Editar Fazenda" }));
   }, [dispatch]);
 
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const id = queryParams.get("id");
+    if (id) {
+      setFarmId(id);
+    }
+  }, [location.search]);
+
+  useEffect(() => {
+    if (!token || !farmId) return;
+
+    const fetchFarm = async () => {
+      try {
+        const farm = await FarmService.getFarm({ token, id: farmId });
+        if (farm) {
+          setName(farm.name);
+          setCity(farm.city);
+          setState(farm.state);
+          setTotalArea(farm.total_area.toString());
+          setArableArea(farm.arable_area.toString());
+          setVegetationArea(farm.vegetation_area.toString());
+          setProducerId(farm.producer);
+        }
+      } catch (err) {
+        setError("Erro ao carregar os dados da fazenda.");
+      }
+    };
+
+    fetchFarm();
+  }, [token, farmId]);
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccessMessage(null);
 
-    if (!cpfCnpj || !name) {
-        setError("Todos os campos são obrigatórios.");
-        return;
+    if (!name || !city || !state || !totalArea || !arableArea || !vegetationArea || !producerId) {
+      setError("Todos os campos são obrigatórios.");
+      return;
     }
 
     setLoading(true);
 
     try {
-        if (!token) {
-            setError("Usuário não autenticado.");
-            return;
-        }
-        if (!producerId) {
-          setError("ID do produtor não informado. 002");
-          return;
-        }
-        const producer = await ProducerService.updateProducer({
-            token,
-            id: producerId,
-            producer: {
-                cpf_cnpj: cpfCnpj,
-                name,
-            },
-        });
+      if (!token || !farmId) {
+        setError("Usuário não autenticado ou ID da fazenda não informado.");
+        return;
+      }
 
-        if (producer) {
-            setSuccessMessage("Produtor atualizado com sucesso!");
-            navigate("/rural-producer-list");
-        }
+      const updatedFarm = await FarmService.updateFarm({
+        token,
+        id: farmId,
+        farm: {
+          name,
+          city,
+          state,
+          total_area: parseFloat(totalArea),
+          arable_area: parseFloat(arableArea),
+          vegetation_area: parseFloat(vegetationArea),
+          producer: producerId,
+        },
+      });
+
+      if (updatedFarm) {
+        setSuccessMessage("Fazenda atualizada com sucesso!");
+        navigate("/farm-list");
+      }
     } catch (err) {
-        if (err instanceof Error) {
-            setError(err.message);
-        } else {
-            setError("An unknown error occurred.");
-        }
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Ocorreu um erro desconhecido.");
+      }
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const id = queryParams.get("id");
-    if (id) {
-      setProducerId(id);
-    }
-  }, [location.search]);
-
-  useEffect(() => {
-    if (!token) {
-      return;
-    }
-    if (!producerId) {
-      return
-    }
-    const fetchProducer = async () => {
-        try {
-            if (!token) {
-                setError("Usuário não autenticado.");
-                return;
-            }
-
-            if (!producerId) {
-                setError("ID do produtor não informado. 001");
-                return;
-            }
-            const producer = await ProducerService.getProducer({
-                token,
-                id: producerId,
-            });
-
-            if (producer) {
-                setCpfCnpj(producer.cpf_cnpj);
-                setName(producer.name);
-            }
-        } catch (err) {
-            setError("Erro ao carregar os dados do produtor.");
-        }
-    };
-
-    fetchProducer();
-  }, [token, producerId]);
 
   return (
     <FarmUpdateContainer>
@@ -140,23 +135,74 @@ const FarmUpdate: React.FC = () => {
             {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
             <form onSubmit={handleFormSubmit}>
               <FormField>
-                <FormLabel htmlFor="cpfCnpj">CPF/CNPJ:</FormLabel>
-                <FormInput
-                  id="cpfCnpj"
-                  type="text"
-                  value={cpfCnpj}
-                  onChange={(e) => setCpfCnpj(e.target.value)}
-                  placeholder="Digite o CPF ou CNPJ"
-                />
-              </FormField>
-              <FormField>
                 <FormLabel htmlFor="name">Nome:</FormLabel>
                 <FormInput
                   id="name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Digite o nome"
+                  placeholder="Digite o nome da fazenda"
+                />
+              </FormField>
+              <FormField>
+                <FormLabel htmlFor="city">Cidade:</FormLabel>
+                <FormInput
+                  id="city"
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Digite a cidade"
+                />
+              </FormField>
+              <FormField>
+                <FormLabel htmlFor="state">Estado:</FormLabel>
+                <FormInput
+                  id="state"
+                  type="text"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                  placeholder="Digite o estado"
+                />
+              </FormField>
+              <FormField>
+                <FormLabel htmlFor="totalArea">Área Total (ha):</FormLabel>
+                <FormInput
+                  id="totalArea"
+                  type="number"
+                  value={totalArea}
+                  onChange={(e) => setTotalArea(e.target.value)}
+                  placeholder="Digite a área total"
+                />
+              </FormField>
+              <FormField>
+                <FormLabel htmlFor="arableArea">Área Agricultável (ha):</FormLabel>
+                <FormInput
+                  id="arableArea"
+                  type="number"
+                  value={arableArea}
+                  onChange={(e) => setArableArea(e.target.value)}
+                  placeholder="Digite a área agricultável"
+                />
+              </FormField>
+              <FormField>
+                <FormLabel htmlFor="vegetationArea">Área de Vegetação (ha):</FormLabel>
+                <FormInput
+                  id="vegetationArea"
+                  type="number"
+                  value={vegetationArea}
+                  onChange={(e) => setVegetationArea(e.target.value)}
+                  placeholder="Digite a área de vegetação"
+                />
+              </FormField>
+              <FormField>
+                <FormLabel htmlFor="producerId">ID do Produtor:</FormLabel>
+                <FormInput
+                  id="producerId"
+                  type="text"
+                  value={producerId}
+                  onChange={(e) => setProducerId(e.target.value)}
+                  placeholder="Digite o ID do produtor"
+                  disabled
                 />
               </FormField>
               <ButtonContainer>

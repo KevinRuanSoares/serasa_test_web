@@ -112,6 +112,9 @@ export const FarmService = {
       });
       return data;
     } catch (error: any) {
+      if (error.response && error.response.data?.non_field_errors) {
+        throw new Error(error.response.data.non_field_errors[0]);
+      }
       console.error("Error updating farm:", error);
       throw new Error("Erro ao atualizar a fazenda.");
     }
@@ -126,6 +129,9 @@ export const FarmService = {
       });
       return data;
     } catch (error: any) {
+      if (error.response && error.response.data?.non_field_errors) {
+        throw new Error(error.response.data.non_field_errors[0]);
+      }
       console.error("Error creating farm:", error);
       throw new Error("Erro ao criar a fazenda.");
     }

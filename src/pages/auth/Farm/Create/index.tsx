@@ -12,7 +12,7 @@ import {
   ButtonContainer,
 } from "./styles";
 import { setCurrentPageTitle } from "../../../../redux/slices/themeSlice";
-import { ProducerService } from "../../../../services/producers";
+import { FarmService } from "../../../../services/farms";
 import Modal from "../../../../components/Modal";
 import {
   FormContainer,
@@ -25,8 +25,13 @@ import {
 const FarmCreate: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [cpfCnpj, setCpfCnpj] = useState("");
   const [name, setName] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [totalArea, setTotalArea] = useState("");
+  const [arableArea, setArableArea] = useState("");
+  const [vegetationArea, setVegetationArea] = useState("");
+  const [producerId, setProducerId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,7 +48,7 @@ const FarmCreate: React.FC = () => {
     setError(null);
     setSuccessMessage(null);
 
-    if (!cpfCnpj || !name) {
+    if (!name || !city || !state || !totalArea || !arableArea || !vegetationArea || !producerId) {
       setError("Todos os campos são obrigatórios.");
       return;
     }
@@ -55,17 +60,23 @@ const FarmCreate: React.FC = () => {
         setError("Usuário não autenticado.");
         return;
       }
-      const producer = await ProducerService.createProducer({
+
+      const farm = await FarmService.createFarm({
         token,
-        producer: {
-          cpf_cnpj: cpfCnpj,
+        farm: {
           name,
+          city,
+          state,
+          total_area: parseFloat(totalArea),
+          arable_area: parseFloat(arableArea),
+          vegetation_area: parseFloat(vegetationArea),
+          producer: producerId,
         },
       });
 
-      if (producer) {
+      if (farm) {
         setSuccessMessage("Fazenda cadastrada com sucesso!");
-        navigate("/rural-producer-list");
+        navigate("/farm-list");
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -78,30 +89,6 @@ const FarmCreate: React.FC = () => {
     }
   };
 
-  const handleCpfCnpjChange = (value: string) => {
-    // Remove caracteres não numéricos
-    const numericValue = value.replace(/\D/g, "");
-
-    // Aplica máscara de CPF ou CNPJ
-    let formattedValue = numericValue;
-    if (numericValue.length <= 11) {
-      // CPF: 000.000.000-00
-      formattedValue = numericValue
-        .replace(/(\d{3})(\d)/, "$1.$2")
-        .replace(/(\d{3})(\d)/, "$1.$2")
-        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-    } else {
-      // CNPJ: 00.000.000/0000-00
-      formattedValue = numericValue
-        .replace(/(\d{2})(\d)/, "$1.$2")
-        .replace(/(\d{3})(\d)/, "$1.$2")
-        .replace(/(\d{3})(\d{1,4})$/, "$1/$2")
-        .replace(/(\d{4})(\d{1,2})$/, "$1-$2");
-    }
-
-    setCpfCnpj(formattedValue);
-  };
-
   return (
     <FarmCreateContainer>
       <Sidebar />
@@ -110,21 +97,8 @@ const FarmCreate: React.FC = () => {
         <MainContent>
           <FormContainer>
             <FormTitle>Cadastrar Fazenda</FormTitle>
-            {successMessage && (
-              <p style={{ color: "green" }}>{successMessage}</p>
-            )}
+            {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
             <form onSubmit={handleFormSubmit}>
-              <FormField>
-                <FormLabel htmlFor="cpfCnpj">CPF/CNPJ:</FormLabel>
-                <FormInput
-                  id="cpfCnpj"
-                  type="text"
-                  value={cpfCnpj}
-                  onChange={(e) => handleCpfCnpjChange(e.target.value)}
-                  placeholder="Digite o CPF ou CNPJ"
-                  maxLength={18} // Limita o tamanho máximo da máscara
-                />
-              </FormField>
               <FormField>
                 <FormLabel htmlFor="name">Nome:</FormLabel>
                 <FormInput
@@ -132,7 +106,67 @@ const FarmCreate: React.FC = () => {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Digite o nome"
+                  placeholder="Digite o nome da fazenda"
+                />
+              </FormField>
+              <FormField>
+                <FormLabel htmlFor="city">Cidade:</FormLabel>
+                <FormInput
+                  id="city"
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Digite a cidade"
+                />
+              </FormField>
+              <FormField>
+                <FormLabel htmlFor="state">Estado:</FormLabel>
+                <FormInput
+                  id="state"
+                  type="text"
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                  placeholder="Digite o estado"
+                />
+              </FormField>
+              <FormField>
+                <FormLabel htmlFor="totalArea">Área Total (ha):</FormLabel>
+                <FormInput
+                  id="totalArea"
+                  type="number"
+                  value={totalArea}
+                  onChange={(e) => setTotalArea(e.target.value)}
+                  placeholder="Digite a área total"
+                />
+              </FormField>
+              <FormField>
+                <FormLabel htmlFor="arableArea">Área Agricultável (ha):</FormLabel>
+                <FormInput
+                  id="arableArea"
+                  type="number"
+                  value={arableArea}
+                  onChange={(e) => setArableArea(e.target.value)}
+                  placeholder="Digite a área agricultável"
+                />
+              </FormField>
+              <FormField>
+                <FormLabel htmlFor="vegetationArea">Área de Vegetação (ha):</FormLabel>
+                <FormInput
+                  id="vegetationArea"
+                  type="number"
+                  value={vegetationArea}
+                  onChange={(e) => setVegetationArea(e.target.value)}
+                  placeholder="Digite a área de vegetação"
+                />
+              </FormField>
+              <FormField>
+                <FormLabel htmlFor="producerId">ID do Produtor:</FormLabel>
+                <FormInput
+                  id="producerId"
+                  type="text"
+                  value={producerId}
+                  onChange={(e) => setProducerId(e.target.value)}
+                  placeholder="Digite o ID do produtor"
                 />
               </FormField>
               <ButtonContainer>
@@ -144,13 +178,7 @@ const FarmCreate: React.FC = () => {
           </FormContainer>
         </MainContent>
       </ContentArea>
-      {error && (
-        <Modal
-          title="Ops!"
-          message={error}
-          onClose={() => setError(null)}
-        />
-      )}
+      {error && <Modal title="Ops!" message={error} onClose={() => setError(null)} />}
     </FarmCreateContainer>
   );
 };
