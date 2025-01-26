@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const RuralProducerListContainer = styled.div`
+export const CropListContainer = styled.div`
   display: flex;
   height: 100vh;
   background-color: #fff !important;
