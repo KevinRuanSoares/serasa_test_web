@@ -58,7 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
                 }}
               >
                 <List size={20} />
-                <span>Crops</span>
+                <span>Plantações</span>
               </NavItem>
             </NavSection>
             <LogoutSection>
