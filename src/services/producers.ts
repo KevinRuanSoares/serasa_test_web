@@ -38,6 +38,16 @@ export interface ProducerCreateParams {
   name: string;
 }
 
+interface DashboardDataResponse {
+  farms_by_state: { state: string; count: number }[];
+  crops_distribution: { crop: string; count: number }[];
+  land_use: {
+    total_area: number;
+    arable_area: number;
+    vegetation_area: number;
+  };
+}
+
 export const ProducerService = {
   async getProducers({ token, filters, ordering }: GetProducersParams): Promise<PaginatedProducerResponse | null> {
     try {
@@ -100,7 +110,7 @@ export const ProducerService = {
     } catch (error: any) {
       // Handle specific validation error for CPF/CNPJ
       if (error.response && error.response.data?.cpf_cnpj) {
-          throw new Error(error.response.data.cpf_cnpj[0]);
+        throw new Error(error.response.data.cpf_cnpj[0]);
       }
       console.error("Error creating producer:", error);
       throw new Error("Erro ao criar o produtor.");
@@ -109,19 +119,33 @@ export const ProducerService = {
 
   async createProducer({ token, producer }: { token: string; producer: ProducerCreateParams }): Promise<Producer | null> {
     try {
-        const { data } = await api.post(`/producer/`, producer, {
-            headers: {
-                Authorization: `Token ${token}`,
-            },
-        });
-        return data;
+      const { data } = await api.post(`/producer/`, producer, {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+      return data;
     } catch (error: any) {
-        // Handle specific validation error for CPF/CNPJ
-        if (error.response && error.response.data?.cpf_cnpj) {
-            throw new Error(error.response.data.cpf_cnpj[0]);
-        }
-        console.error("Error creating producer:", error);
-        throw new Error("Erro ao criar o produtor.");
+      // Handle specific validation error for CPF/CNPJ
+      if (error.response && error.response.data?.cpf_cnpj) {
+        throw new Error(error.response.data.cpf_cnpj[0]);
+      }
+      console.error("Error creating producer:", error);
+      throw new Error("Erro ao criar o produtor.");
+    }
+  },
+
+  async getDashboardData(token: string): Promise<DashboardDataResponse | null> {
+    try {
+      const { data } = await api.get<DashboardDataResponse>('/producer/dashboard/', {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      });
+      return data;
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      return null;
     }
   }
 };
