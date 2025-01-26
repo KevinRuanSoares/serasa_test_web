@@ -9,7 +9,7 @@ interface SidebarProps {
   onLogout?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
+const Sidebar: React.FC<SidebarProps> = ({}) => {
 
   const theme = useSelector((state: IRootState) => state.theme);
   const navigate = useNavigate();

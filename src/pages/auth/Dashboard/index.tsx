@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { IRootState } from "../../../redux/store";
 import TopBar from "../../../components/TopBar";
 import Sidebar from "../../../components/Sidebar";
@@ -15,7 +14,6 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const userAuth = useSelector((state: IRootState) => state.auth);
   const token = userAuth.token;
 

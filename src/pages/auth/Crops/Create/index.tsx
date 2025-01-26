@@ -20,7 +20,6 @@ import {
   FormLabel,
   FormTitle,
   FormRow,
-  FormSelect,
 } from "./styledForm";
 
 const CropCreate: React.FC = () => {

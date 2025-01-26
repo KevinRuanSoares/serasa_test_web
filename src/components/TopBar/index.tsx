@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IRootState } from '../../redux/store';
 import { logout } from '../../redux/slices/authSlice';
 import { toggleMenu } from '../../redux/slices/themeSlice';
-import { TopBarContainer, LeftSection, IconButton, CenterSection, SearchInputContainer, SearchInput, LogoutButton } from "./styled";
+import { TopBarContainer, LeftSection, IconButton, LogoutButton } from "./styled";
 import { Menu, LogOut } from "lucide-react";
 
 
