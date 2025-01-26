@@ -5,14 +5,14 @@ import { useNavigate } from "react-router-dom";
 import TopBar from "../../../../components/TopBar";
 import Sidebar from "../../../../components/Sidebar";
 import {
-  HarvestsCreateContainer,
+  PlantedCropsCreateContainer,
   ContentArea,
   MainContent,
   ButtonContainer,
 } from "./styles";
 import { setCurrentPageTitle } from "../../../../redux/slices/themeSlice";
-import { HarvestService } from "../../../../services/harvests";
-import { FarmService, Farm } from "../../../../services/farms";
+import { PlantedCropService } from "../../../../services/planted_crops";
+import { HarvestService, Harvest } from "../../../../services/harvests";
 import Modal from "../../../../components/Modal";
 import {
   FormContainer,
@@ -24,12 +24,12 @@ import {
   FormSelect,
 } from "./styledForm";
 
-const HarvestsCreate: React.FC = () => {
+const PlantedCropsCreate: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [year, setYear] = useState("");
-  const [farm, setFarm] = useState("");
-  const [farms, setFarms] = useState<Farm[]>([]);
+  const [harvest, setHarvest] = useState("");
+  const [crop, setCrop] = useState("");
+  const [harvests, setHarvests] = useState<Harvest[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -37,35 +37,36 @@ const HarvestsCreate: React.FC = () => {
   const userAuth = useSelector((state: IRootState) => state.auth);
   const token = userAuth.token;
 
-  // Define anos disponíveis
-  const years = Array.from(
-    { length: 10 },
-    (_, i) => new Date().getFullYear() - i
-  ).map((year) => year.toString());
+  // Define culturas disponíveis
+  const crops = [
+    { id: "corn", name: "Corn" },
+    { id: "soybean", name: "Soybean" },
+    { id: "wheat", name: "Wheat" },
+  ];
 
   useEffect(() => {
-    dispatch(setCurrentPageTitle({ title: "Cadastrar Colheita" }));
+    dispatch(setCurrentPageTitle({ title: "Cadastrar Cultura Plantada" }));
   }, [dispatch]);
 
-  // Carrega fazendas ao montar o componente
+  // Carrega colheitas ao montar o componente
   useEffect(() => {
-    const fetchFarms = async () => {
+    const fetchHarvests = async () => {
       try {
         if (!token) {
           setError("Usuário não autenticado.");
           return;
         }
 
-        const response = await FarmService.getFarms({ token });
+        const response = await HarvestService.getHarvests({ token });
         if (response) {
-          setFarms(response.results);
+          setHarvests(response.results);
         }
       } catch (err) {
-        setError("Erro ao carregar as fazendas.");
+        setError("Erro ao carregar as colheitas.");
       }
     };
 
-    fetchFarms();
+    fetchHarvests();
   }, [token]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -73,8 +74,8 @@ const HarvestsCreate: React.FC = () => {
     setError(null);
     setSuccessMessage(null);
 
-    if (!year || !farm) {
-      setError("Os campos Ano e Fazenda são obrigatórios.");
+    if (!harvest || !crop) {
+      setError("Os campos Colheita e Cultura são obrigatórios.");
       return;
     }
 
@@ -86,14 +87,14 @@ const HarvestsCreate: React.FC = () => {
         return;
       }
 
-      const harvest = await HarvestService.createHarvest({
+      const plantedCrop = await PlantedCropService.createPlantedCrop({
         token,
-        harvest: { year, farm },
+        plantedCrop: { harvest, crop },
       });
 
-      if (harvest) {
-        setSuccessMessage("Colheita cadastrada com sucesso!");
-        navigate("/harvest-list");
+      if (plantedCrop) {
+        setSuccessMessage("Cultura plantada cadastrada com sucesso!");
+        navigate("/planted-crop-list");
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -107,29 +108,29 @@ const HarvestsCreate: React.FC = () => {
   };
 
   return (
-    <HarvestsCreateContainer>
+    <PlantedCropsCreateContainer>
       <Sidebar />
       <ContentArea>
         <TopBar />
         <MainContent>
           <FormContainer>
-            <FormTitle>Cadastrar Colheita</FormTitle>
+            <FormTitle>Cadastrar Cultura Plantada</FormTitle>
             {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
             <form onSubmit={handleFormSubmit}>
               <FormRow>
                 <FormField>
-                  <FormLabel htmlFor="year">Ano:</FormLabel>
+                  <FormLabel htmlFor="harvest">Colheita:</FormLabel>
                   <FormSelect
-                    id="year"
-                    value={year}
-                    onChange={(e) => setYear(e.target.value)}
+                    id="harvest"
+                    value={harvest}
+                    onChange={(e) => setHarvest(e.target.value)}
                   >
                     <option value="" disabled>
-                      Selecione o ano
+                      Selecione a colheita
                     </option>
-                    {years.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
+                    {harvests.map((harvest) => (
+                      <option key={harvest.id} value={harvest.id}>
+                        {harvest.year} - {harvest.farm_name}
                       </option>
                     ))}
                   </FormSelect>
@@ -137,18 +138,18 @@ const HarvestsCreate: React.FC = () => {
               </FormRow>
               <FormRow>
                 <FormField>
-                  <FormLabel htmlFor="farm">Fazenda:</FormLabel>
+                  <FormLabel htmlFor="crop">Cultura:</FormLabel>
                   <FormSelect
-                    id="farm"
-                    value={farm}
-                    onChange={(e) => setFarm(e.target.value)}
+                    id="crop"
+                    value={crop}
+                    onChange={(e) => setCrop(e.target.value)}
                   >
                     <option value="" disabled>
-                      Selecione a fazenda
+                      Selecione a cultura
                     </option>
-                    {farms.map((farm) => (
-                      <option key={farm.id} value={farm.id}>
-                        {farm.name} - {farm.city}, {farm.state}
+                    {crops.map((crop) => (
+                      <option key={crop.id} value={crop.id}>
+                        {crop.name}
                       </option>
                     ))}
                   </FormSelect>
@@ -164,8 +165,8 @@ const HarvestsCreate: React.FC = () => {
         </MainContent>
       </ContentArea>
       {error && <Modal title="Ops!" message={error} onClose={() => setError(null)} />}
-    </HarvestsCreateContainer>
+    </PlantedCropsCreateContainer>
   );
 };
 
-export default HarvestsCreate;
+export default PlantedCropsCreate;

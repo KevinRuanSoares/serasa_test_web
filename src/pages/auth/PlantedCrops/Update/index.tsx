@@ -5,14 +5,14 @@ import { useNavigate, useLocation } from "react-router-dom";
 import TopBar from "../../../../components/TopBar";
 import Sidebar from "../../../../components/Sidebar";
 import {
-  HarvestUpdateContainer,
+  PlantedCropUpdateContainer,
   ContentArea,
   MainContent,
   ButtonContainer,
 } from "./styles";
 import { setCurrentPageTitle } from "../../../../redux/slices/themeSlice";
-import { HarvestService } from "../../../../services/harvests";
-import { FarmService, Farm } from "../../../../services/farms";
+import { PlantedCropService } from "../../../../services/planted_crops";
+import { HarvestService, Harvest } from "../../../../services/harvests";
 import Modal from "../../../../components/Modal";
 import {
   FormContainer,
@@ -23,14 +23,14 @@ import {
   FormRow,
 } from "./styledForm";
 
-const HarvestUpdate: React.FC = () => {
+const PlantedCropUpdate: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const [harvestId, setHarvestId] = useState<string | null>(null);
-  const [year, setYear] = useState("");
-  const [farm, setFarm] = useState("");
-  const [farms, setFarms] = useState<Farm[]>([]);
+  const [plantedCropId, setPlantedCropId] = useState<string | null>(null);
+  const [harvest, setHarvest] = useState("");
+  const [crop, setCrop] = useState("");
+  const [harvests, setHarvests] = useState<Harvest[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -38,60 +38,63 @@ const HarvestUpdate: React.FC = () => {
   const userAuth = useSelector((state: IRootState) => state.auth);
   const token = userAuth.token;
 
-  // Define anos disponíveis
-  const years = Array.from(
-    { length: 10 },
-    (_, i) => new Date().getFullYear() - i
-  ).map((year) => year.toString());
+  const crops = [
+    { id: "corn", name: "Corn" },
+    { id: "soybean", name: "Soybean" },
+    { id: "wheat", name: "Wheat" },
+  ];
 
   useEffect(() => {
-    dispatch(setCurrentPageTitle({ title: "Editar Colheita" }));
+    dispatch(setCurrentPageTitle({ title: "Editar Cultura Plantada" }));
   }, [dispatch]);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const id = queryParams.get("id");
     if (id) {
-      setHarvestId(id);
+      setPlantedCropId(id);
     }
   }, [location.search]);
 
   useEffect(() => {
-    if (!token || !harvestId) return;
+    if (!token || !plantedCropId) return;
 
-    const fetchHarvest = async () => {
+    const fetchPlantedCrop = async () => {
       try {
-        const harvest = await HarvestService.getHarvest({ token, id: harvestId });
-        if (harvest) {
-          setYear(harvest.year);
-          setFarm(harvest.farm);
+        const plantedCrop = await PlantedCropService.getPlantedCrop({
+          token,
+          id: plantedCropId,
+        });
+        if (plantedCrop) {
+          setHarvest(plantedCrop.harvest);
+          setCrop(plantedCrop.crop);
         }
       } catch (err) {
-        setError("Erro ao carregar os dados da colheita.");
+        setError("Erro ao carregar os dados da cultura plantada.");
       }
     };
 
-    fetchHarvest();
-  }, [token, harvestId]);
+    fetchPlantedCrop();
+  }, [token, plantedCropId]);
 
   useEffect(() => {
-    const fetchFarms = async () => {
+    const fetchHarvests = async () => {
       try {
         if (!token) {
           setError("Usuário não autenticado.");
           return;
         }
 
-        const response = await FarmService.getFarms({ token });
+        const response = await HarvestService.getHarvests({ token });
         if (response) {
-          setFarms(response.results);
+          setHarvests(response.results);
         }
       } catch (err) {
-        setError("Erro ao carregar as fazendas.");
+        setError("Erro ao carregar as colheitas.");
       }
     };
 
-    fetchFarms();
+    fetchHarvests();
   }, [token]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -99,28 +102,28 @@ const HarvestUpdate: React.FC = () => {
     setError(null);
     setSuccessMessage(null);
 
-    if (!year || !farm) {
-      setError("Os campos Ano e Fazenda são obrigatórios.");
+    if (!harvest || !crop) {
+      setError("Os campos Colheita e Cultura são obrigatórios.");
       return;
     }
 
     setLoading(true);
 
     try {
-      if (!token || !harvestId) {
-        setError("Usuário não autenticado ou ID da colheita não informado.");
+      if (!token || !plantedCropId) {
+        setError("Usuário não autenticado ou ID da cultura plantada não informado.");
         return;
       }
 
-      const updatedHarvest = await HarvestService.updateHarvest({
+      const updatedPlantedCrop = await PlantedCropService.updatePlantedCrop({
         token,
-        id: harvestId,
-        harvest: { year, farm },
+        id: plantedCropId,
+        plantedCrop: { harvest, crop },
       });
 
-      if (updatedHarvest) {
-        setSuccessMessage("Colheita atualizada com sucesso!");
-        navigate("/harvest-list");
+      if (updatedPlantedCrop) {
+        setSuccessMessage("Cultura plantada atualizada com sucesso!");
+        navigate("/planted-crop-list");
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -134,29 +137,29 @@ const HarvestUpdate: React.FC = () => {
   };
 
   return (
-    <HarvestUpdateContainer>
+    <PlantedCropUpdateContainer>
       <Sidebar />
       <ContentArea>
         <TopBar />
         <MainContent>
           <FormContainer>
-            <FormTitle>Editar Colheita</FormTitle>
+            <FormTitle>Editar Cultura Plantada</FormTitle>
             {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
             <form onSubmit={handleFormSubmit}>
               <FormRow>
                 <FormField>
-                  <FormLabel htmlFor="year">Ano:</FormLabel>
+                  <FormLabel htmlFor="harvest">Colheita:</FormLabel>
                   <FormSelect
-                    id="year"
-                    value={year}
-                    onChange={(e) => setYear(e.target.value)}
+                    id="harvest"
+                    value={harvest}
+                    onChange={(e) => setHarvest(e.target.value)}
                   >
                     <option value="" disabled>
-                      Selecione o ano
+                      Selecione a colheita
                     </option>
-                    {years.map((year) => (
-                      <option key={year} value={year}>
-                        {year}
+                    {harvests.map((harvest) => (
+                      <option key={harvest.id} value={harvest.id}>
+                        {harvest.year} - {harvest.farm_name}
                       </option>
                     ))}
                   </FormSelect>
@@ -164,18 +167,18 @@ const HarvestUpdate: React.FC = () => {
               </FormRow>
               <FormRow>
                 <FormField>
-                  <FormLabel htmlFor="farm">Fazenda:</FormLabel>
+                  <FormLabel htmlFor="crop">Cultura:</FormLabel>
                   <FormSelect
-                    id="farm"
-                    value={farm}
-                    onChange={(e) => setFarm(e.target.value)}
+                    id="crop"
+                    value={crop}
+                    onChange={(e) => setCrop(e.target.value)}
                   >
                     <option value="" disabled>
-                      Selecione a fazenda
+                      Selecione a cultura
                     </option>
-                    {farms.map((farm) => (
-                      <option key={farm.id} value={farm.id}>
-                        {farm.name} - {farm.city}, {farm.state}
+                    {crops.map((crop) => (
+                      <option key={crop.id} value={crop.id}>
+                        {crop.name}
                       </option>
                     ))}
                   </FormSelect>
@@ -191,8 +194,8 @@ const HarvestUpdate: React.FC = () => {
         </MainContent>
       </ContentArea>
       {error && <Modal title="Ops!" message={error} onClose={() => setError(null)} />}
-    </HarvestUpdateContainer>
+    </PlantedCropUpdateContainer>
   );
 };
 
-export default HarvestUpdate;
+export default PlantedCropUpdate;

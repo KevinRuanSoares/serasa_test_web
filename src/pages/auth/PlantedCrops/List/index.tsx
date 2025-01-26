@@ -7,21 +7,23 @@ import Sidebar from "../../../../components/Sidebar";
 import { Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { setCurrentPageTitle } from "../../../../redux/slices/themeSlice";
 import {
-  HarvestsListContainer,
+  PlantedCropsListContainer,
   ContentArea,
   MainContent,
   PaginationContainer,
   ButtonContainer,
 } from "./styles";
 import GenericTable from "../../../../components/GenericTable";
-import { HarvestService } from "../../../../services/harvests";
+import { PlantedCropService } from "../../../../services/planted_crops";
 import Modal from "../../../../components/Modal";
 import ModalConfirmAlert from "../../../../components/ModalConfirm";
 
-interface Harvest {
+interface PlantedCrop {
   id: string;
-  year: string;
-  farm: string;
+  harvest: string;
+  crop: string;
+  crop_name: string;
+  harvest_year: string;
   farm_name: string;
   created_at: string;
   updated_at: string;
@@ -33,9 +35,9 @@ interface PaginationData {
   previous: string | null;
 }
 
-const HarvestList: React.FC = () => {
+const PlantedCropsList: React.FC = () => {
   const dispatch = useDispatch();
-  const [harvests, setHarvests] = useState<Harvest[]>([]);
+  const [plantedCrops, setPlantedCrops] = useState<PlantedCrop[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [paginationData, setPaginationData] = useState<PaginationData>({
     count: 0,
@@ -55,7 +57,7 @@ const HarvestList: React.FC = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [confirmModalMessage, setConfirmModalMessage] = useState("");
   const [confirmModalTitle, setConfirmModalTitle] = useState("");
-  const [deleteHarvestId, setDeleteHarvestId] = useState<string | null>(null);
+  const [deletePlantedCropId, setDeletePlantedCropId] = useState<string | null>(null);
 
   const userAuth = useSelector((state: IRootState) => state.auth);
   const token = userAuth.token;
@@ -63,14 +65,14 @@ const HarvestList: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(setCurrentPageTitle({ title: "Colheitas" }));
+    dispatch(setCurrentPageTitle({ title: "Culturas Plantadas" }));
   }, [dispatch]);
 
   useEffect(() => {
-    fetchHarvests(currentPage);
+    fetchPlantedCrops(currentPage);
   }, [currentPage]);
 
-  const fetchHarvests = async (page: number) => {
+  const fetchPlantedCrops = async (page: number) => {
     setLoading(true);
     setError(null);
     try {
@@ -79,13 +81,13 @@ const HarvestList: React.FC = () => {
         return;
       }
 
-      const data = await HarvestService.getHarvests({
+      const data = await PlantedCropService.getPlantedCrops({
         token,
         filters: { page },
       });
 
       if (data) {
-        setHarvests(data.results);
+        setPlantedCrops(data.results);
         setPaginationData({
           count: data.count,
           next: data.next,
@@ -108,24 +110,27 @@ const HarvestList: React.FC = () => {
   const handleShowConfirmModal = (title: string, message: string, id?: string) => {
     setConfirmModalTitle(title);
     setConfirmModalMessage(message);
-    if (id) setDeleteHarvestId(id);
+    if (id) setDeletePlantedCropId(id);
     setShowConfirmModal(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (!token || !deleteHarvestId) {
+    if (!token || !deletePlantedCropId) {
       handleShowModal("Ops!", "Usuário não autenticado.");
       return;
     }
 
-    const success = await HarvestService.deleteHarvest({ token, id: deleteHarvestId });
+    const success = await PlantedCropService.deletePlantedCrop({
+      token,
+      id: deletePlantedCropId,
+    });
     if (success) {
-      handleShowModal("Sucesso", "Colheita excluída com sucesso.");
-      fetchHarvests(currentPage);
+      handleShowModal("Sucesso", "Cultura plantada excluída com sucesso.");
+      fetchPlantedCrops(currentPage);
     } else {
-      handleShowModal("Ops!", "Falha ao excluir a colheita.");
+      handleShowModal("Ops!", "Falha ao excluir a cultura plantada.");
     }
-    setDeleteHarvestId(null);
+    setDeletePlantedCropId(null);
     setShowConfirmModal(false);
   };
 
@@ -138,15 +143,20 @@ const HarvestList: React.FC = () => {
   };
 
   const handleCreate = async () => {
-    navigate("/harvest-create");
+    navigate("/planted-crop-create");
   };
 
   const handleEdit = async (id: string) => {
-    navigate(`/harvest-update?id=${id}`);
+    navigate(`/planted-crop-update?id=${id}`);
   };
 
-  const columns: { header: string; accessor: keyof Harvest; render?: (value: any) => string }[] = [
-    { header: "Ano", accessor: "year" },
+  const columns: {
+    header: string;
+    accessor: keyof PlantedCrop;
+    render?: (value: any) => string;
+  }[] = [
+    { header: "Cultura", accessor: "crop_name" },
+    { header: "Ano da Colheita", accessor: "harvest_year" },
     { header: "Fazenda", accessor: "farm_name" },
     {
       header: "Criado",
@@ -161,18 +171,18 @@ const HarvestList: React.FC = () => {
   ];
 
   return (
-    <HarvestsListContainer>
+    <PlantedCropsListContainer>
       <Sidebar />
       <ContentArea>
         <TopBar />
         <MainContent>
           <ButtonContainer>
-            <button onClick={handleCreate}>+ Cadastrar Colheita</button>
+            <button onClick={handleCreate}>+ Cadastrar Cultura Plantada</button>
           </ButtonContainer>
           {loading && <p>Carregando...</p>}
           {error && <p style={{ color: "red" }}>{error}</p>}
           <GenericTable
-            data={harvests}
+            data={plantedCrops}
             columns={columns}
             edit={(row) => (
               <button className="edit" onClick={() => handleEdit(row.id)}>
@@ -185,7 +195,7 @@ const HarvestList: React.FC = () => {
                 onClick={() =>
                   handleShowConfirmModal(
                     "Confirmar Exclusão",
-                    "Tem certeza de que deseja excluir esta colheita?",
+                    "Tem certeza de que deseja excluir esta cultura plantada?",
                     row.id
                   )
                 }
@@ -222,13 +232,13 @@ const HarvestList: React.FC = () => {
           message={confirmModalMessage}
           onConfirm={handleConfirmDelete}
           onCancel={() => {
-            setDeleteHarvestId(null);
+            setDeletePlantedCropId(null);
             setShowConfirmModal(false);
           }}
         />
       )}
-    </HarvestsListContainer>
+    </PlantedCropsListContainer>
   );
 };
 
-export default HarvestList;
+export default PlantedCropsList;

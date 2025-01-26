@@ -4,6 +4,7 @@ export interface Harvest {
   id: string;
   year: string;
   farm: string;
+  farm_name: string;
   created_at: string;
   updated_at: string;
 }
