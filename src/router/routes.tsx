@@ -14,6 +14,9 @@ const CropsUpdate = lazy(() => import('../pages/auth/Crops/Update'));
 const HarvestsCreate = lazy(() => import('../pages/auth/Harvests/Create'));
 const HarvestsList = lazy(() => import('../pages/auth/Harvests/List'));
 const HarvestsUpdate = lazy(() => import('../pages/auth/Harvests/Update'));
+const PlantedCropsCreate = lazy(() => import('../pages/auth/PlantedCrops/Create'));
+const PlantedCropsList = lazy(() => import('../pages/auth/PlantedCrops/List'));
+const PlantedCropsUpdate = lazy(() => import('../pages/auth/PlantedCrops/Update'));
 
 const routes = [
     // Public routes
@@ -105,6 +108,24 @@ const routes = [
     {
         path: '/harvest-update',
         element: <HarvestsUpdate />,
+        layout: 'default',
+        protected: true,
+    },
+    {
+        path: '/planted-crop-list',
+        element: <PlantedCropsList />,
+        layout: 'default',
+        protected: true,
+    },
+    {
+        path: '/planted-crop-create',
+        element: <PlantedCropsCreate />,
+        layout: 'default',
+        protected: true,
+    },
+    {
+        path: '/planted-crop-update',
+        element: <PlantedCropsUpdate />,
         layout: 'default',
         protected: true,
     }

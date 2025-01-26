@@ -13,11 +13,11 @@ import {
 import { setCurrentPageTitle } from "../../../../redux/slices/themeSlice";
 import { PlantedCropService } from "../../../../services/planted_crops";
 import { HarvestService, Harvest } from "../../../../services/harvests";
+import { CropService, Crop } from "../../../../services/crops";
 import Modal from "../../../../components/Modal";
 import {
   FormContainer,
   FormField,
-  FormInput,
   FormLabel,
   FormTitle,
   FormRow,
@@ -30,19 +30,13 @@ const PlantedCropsCreate: React.FC = () => {
   const [harvest, setHarvest] = useState("");
   const [crop, setCrop] = useState("");
   const [harvests, setHarvests] = useState<Harvest[]>([]);
+  const [crops, setCrops] = useState<Crop[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const userAuth = useSelector((state: IRootState) => state.auth);
   const token = userAuth.token;
-
-  // Define culturas disponíveis
-  const crops = [
-    { id: "corn", name: "Corn" },
-    { id: "soybean", name: "Soybean" },
-    { id: "wheat", name: "Wheat" },
-  ];
 
   useEffect(() => {
     dispatch(setCurrentPageTitle({ title: "Cadastrar Cultura Plantada" }));
@@ -67,6 +61,27 @@ const PlantedCropsCreate: React.FC = () => {
     };
 
     fetchHarvests();
+  }, [token]);
+
+  // Carrega culturas ao montar o componente
+  useEffect(() => {
+    const fetchCrops = async () => {
+      try {
+        if (!token) {
+          setError("Usuário não autenticado.");
+          return;
+        }
+
+        const response = await CropService.getCrops({ token });
+        if (response) {
+          setCrops(response.results);
+        }
+      } catch (err) {
+        setError("Erro ao carregar as culturas.");
+      }
+    };
+
+    fetchCrops();
   }, [token]);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
